@@ -1,0 +1,223 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — {{ object.name }}{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+    color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  .ft-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .78rem;
+    color: var(--ft-muted);
+    margin-bottom: .6rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a { color: var(--ft-text-sub); text-decoration: none; transition: color .2s; }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  .ft-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    overflow: hidden;
+    max-width: 640px;
+  }
+  .ft-card-bar {
+    height: 4px;
+    background: linear-gradient(90deg, var(--ft-accent), var(--ft-accent2));
+  }
+  .ft-card-body { padding: 2rem; }
+
+  .ft-cat-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 2rem;
+  }
+  .ft-cat-icon {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 52px; height: 52px;
+    background: rgba(0,229,160,.1);
+    border: 1px solid rgba(0,229,160,.25);
+    border-radius: 14px;
+    color: var(--ft-accent);
+    font-size: 1.4rem;
+    flex-shrink: 0;
+  }
+  .ft-cat-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.4rem;
+    color: var(--ft-text);
+    margin: 0 0 .2rem;
+    letter-spacing: -.3px;
+  }
+  .ft-cat-id {
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+    background: rgba(61,139,255,.1);
+    color: var(--ft-accent2);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .72rem;
+    font-weight: 500;
+    padding: .15rem .55rem;
+    border-radius: 6px;
+  }
+
+  .ft-divider { border: none; border-top: 1px solid var(--ft-border); margin: 1.5rem 0; }
+
+  .ft-field { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1.4rem; }
+  .ft-field:last-of-type { margin-bottom: 0; }
+  .ft-field-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--ft-muted);
+  }
+  .ft-field-value {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .92rem;
+    color: var(--ft-text);
+    background: var(--ft-bg);
+    border: 1px solid var(--ft-border);
+    border-radius: 10px;
+    padding: .7rem 1rem;
+    line-height: 1.5;
+  }
+  .ft-field-value.empty { color: var(--ft-muted); font-style: italic; }
+
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-edit {
+    background: rgba(245,197,24,.1);
+    border: 1px solid rgba(245,197,24,.3);
+    color: #f5c518;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-edit:hover { background: rgba(245,197,24,.2); border-color: #f5c518; color: #f5c518; transform: translateY(-1px); }
+
+  .btn-ft-danger {
+    background: rgba(255,68,68,.08);
+    border: 1px solid rgba(255,68,68,.25);
+    color: #f55;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-danger:hover { background: rgba(255,68,68,.15); border-color: #f55; color: #f55; transform: translateY(-1px); }
+
+  .btn-ft-ghost {
+    background: transparent;
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-ghost:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+</style>
+
+<div class="container-fluid px-4">
+
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'category-list' %}">Categorias</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>{{ object.name }}</span>
+    </div>
+    <h1><i class="bi bi-tag-fill me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Detalhe da <span>Categoria</span></h1>
+    <p>Informações completas da categoria selecionada</p>
+  </div>
+
+  <div class="ft-card">
+    <div class="ft-card-bar"></div>
+    <div class="ft-card-body">
+
+      <div class="ft-cat-header">
+        <span class="ft-cat-icon"><i class="bi bi-tag-fill"></i></span>
+        <div>
+          <p class="ft-cat-title">{{ object.name }}</p>
+          <span class="ft-cat-id"><i class="bi bi-hash"></i> ID {{ object.id }}</span>
+        </div>
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-field">
+        <span class="ft-field-label">Nome</span>
+        <div class="ft-field-value">{{ object.name }}</div>
+      </div>
+
+      <div class="ft-field">
+        <span class="ft-field-label">Descrição</span>
+        <div class="ft-field-value {% if not object.description %}empty{% endif %}">
+          {{ object.description|default:"Sem descrição cadastrada." }}
+        </div>
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-actions">
+        <a href="{% url 'category-update' object.id %}" class="btn-ft-edit">
+          <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{% url 'category-delete' object.id %}" class="btn-ft-danger">
+          <i class="bi bi-trash3"></i> Excluir
+        </a>
+        <a href="{% url 'category-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

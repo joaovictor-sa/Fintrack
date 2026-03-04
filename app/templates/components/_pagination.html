@@ -1,0 +1,98 @@
+{% if is_paginated %}
+<div class="ft-pagination-wrap d-flex align-items-center justify-content-between flex-wrap gap-3 mt-4">
+
+  <!-- Info -->
+  <p class="ft-pagination-info mb-0">
+    Mostrando
+    <strong>{{ page_obj.start_index }}</strong>–<strong>{{ page_obj.end_index }}</strong>
+    de <strong>{{ page_obj.paginator.count }}</strong> resultados
+  </p>
+
+  <!-- Controls -->
+  <nav aria-label="Paginação">
+    <ul class="pagination ft-pagination mb-0">
+
+      <!-- First -->
+      {% if page_obj.has_previous %}
+        <li class="page-item">
+          <a class="page-link ft-page-arrow" href="?page=1{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" title="Primeira página">
+            <i class="bi bi-chevron-double-left"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link ft-page-arrow" href="?page={{ page_obj.previous_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" title="Página anterior">
+            <i class="bi bi-chevron-left"></i>
+          </a>
+        </li>
+      {% endif %}
+
+      <!-- Pages window -->
+      {% for num in page_obj.paginator.page_range %}
+        {% if page_obj.number == num %}
+          <li class="page-item active">
+            <span class="page-link ft-page-num">{{ num }}</span>
+          </li>
+        {% elif num >= page_obj.number|add:"-2" and num <= page_obj.number|add:"2" %}
+          <li class="page-item">
+            <a class="page-link ft-page-num" href="?page={{ num }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}">{{ num }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
+      <!-- Last -->
+      {% if page_obj.has_next %}
+        <li class="page-item">
+          <a class="page-link ft-page-arrow" href="?page={{ page_obj.next_page_number }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" title="Próxima página">
+            <i class="bi bi-chevron-right"></i>
+          </a>
+        </li>
+        <li class="page-item">
+          <a class="page-link ft-page-arrow" href="?page={{ page_obj.paginator.num_pages }}{% for key, value in request.GET.items %}{% if key != 'page' %}&{{ key }}={{ value }}{% endif %}{% endfor %}" title="Última página">
+            <i class="bi bi-chevron-double-right"></i>
+          </a>
+        </li>
+      {% endif %}
+
+    </ul>
+  </nav>
+
+</div>
+{% endif %}
+
+<style>
+  .ft-pagination-info {
+    font-family: 'DM Sans', sans-serif;
+    font-size: .8rem;
+    color: var(--ft-muted, #52596b);
+  }
+  .ft-pagination-info strong { color: var(--ft-text-sub, #8d94a6); }
+
+  .ft-pagination { gap: 3px; }
+
+  .ft-pagination .page-link {
+    background: var(--ft-surface, #161920);
+    border: 1px solid var(--ft-border, #242832);
+    color: var(--ft-text-sub, #8d94a6);
+    border-radius: 8px !important;
+    font-family: 'DM Sans', sans-serif;
+    font-size: .82rem;
+    transition: all .18s;
+    line-height: 1;
+  }
+  .ft-page-num  { min-width: 34px; text-align: center; padding: .45rem .6rem; }
+  .ft-page-arrow { padding: .45rem .65rem; }
+
+  .ft-pagination .page-link:hover {
+    background: rgba(0,229,160,.1);
+    border-color: var(--ft-accent, #00e5a0);
+    color: var(--ft-accent, #00e5a0);
+  }
+  .ft-pagination .page-item.active .page-link {
+    background: var(--ft-accent, #00e5a0);
+    border-color: var(--ft-accent, #00e5a0);
+    color: #0d0f14;
+    font-weight: 700;
+    box-shadow: 0 0 14px rgba(0,229,160,.25);
+  }
+  .ft-pagination .page-item.disabled .page-link { opacity: .3; pointer-events: none; }
+</style>

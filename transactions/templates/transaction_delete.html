@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Excluir Transação{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem; border-bottom: 1px solid var(--ft-border); margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+    font-size: 1.9rem; letter-spacing: -0.5px; color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: #f55; }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  .ft-breadcrumb {
+    display: flex; align-items: center; gap: .5rem; font-size: .78rem;
+    color: var(--ft-muted); margin-bottom: .6rem; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a { color: var(--ft-text-sub); text-decoration: none; transition: color .2s; }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  .ft-card { background: var(--ft-surface); border: 1px solid var(--ft-border); border-radius: 16px; padding: 2rem; max-width: 540px; }
+
+  .ft-danger-header {
+    display: flex; align-items: center; gap: 1rem; padding: 1.25rem;
+    background: rgba(255,68,68,.06); border: 1px solid rgba(255,68,68,.2);
+    border-radius: 12px; margin-bottom: 1.75rem;
+  }
+  .ft-danger-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 44px; height: 44px; background: rgba(255,68,68,.12);
+    border-radius: 12px; color: #f55; font-size: 1.2rem; flex-shrink: 0;
+  }
+  .ft-danger-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .95rem; color: var(--ft-text); margin: 0 0 .2rem; }
+  .ft-danger-sub { font-family: 'IBM Plex Sans', sans-serif; font-size: .8rem; color: var(--ft-text-sub); margin: 0; }
+
+  .ft-preview { background: var(--ft-bg); border: 1px solid var(--ft-border); border-radius: 10px; padding: 1.25rem; margin-bottom: 1.75rem; }
+  .ft-preview-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: .8px; text-transform: uppercase; color: var(--ft-muted); margin-bottom: .75rem; }
+
+  .ft-preview-row { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: .5rem; margin-bottom: .5rem; }
+  .ft-preview-title { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .95rem; color: var(--ft-text); }
+  .ft-preview-type {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: .72rem; font-weight: 700;
+    padding: .15rem .55rem; border-radius: 20px;
+  }
+  .ft-preview-type.income { background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.25); color: var(--ft-accent); }
+  .ft-preview-type.expense { background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.25); color: #f55; }
+
+  .ft-preview-meta { font-family: 'IBM Plex Sans', sans-serif; font-size: .82rem; color: var(--ft-text-sub); }
+  .ft-preview-amount { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.2rem; margin-top: .5rem; }
+  .ft-preview-amount.income { color: var(--ft-accent); }
+  .ft-preview-amount.expense { color: #f55; }
+
+  .ft-divider { border: none; border-top: 1px solid var(--ft-border); margin: 1.5rem 0; }
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-danger {
+    background: #d93636; border: none; color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; cursor: pointer;
+    transition: background .2s, transform .15s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-danger:hover { background: #c02e2e; transform: translateY(-1px); color: #fff; }
+
+  .btn-ft-ghost {
+    background: transparent; border: 1px solid var(--ft-border); color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; transition: all .2s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-ghost:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+</style>
+
+<div class="container-fluid px-4">
+
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'transaction-list' %}">Transações</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Excluir</span>
+    </div>
+    <h1><i class="bi bi-trash3-fill me-2" style="color:#f55;font-size:1.4rem;"></i>Excluir <span>Transação</span></h1>
+    <p>Esta ação não poderá ser desfeita</p>
+  </div>
+
+  <div class="ft-card">
+
+    <div class="ft-danger-header">
+      <span class="ft-danger-icon"><i class="bi bi-exclamation-triangle-fill"></i></span>
+      <div>
+        <p class="ft-danger-title">Confirmar exclusão</p>
+        <p class="ft-danger-sub">Você está prestes a excluir permanentemente esta transação.</p>
+      </div>
+    </div>
+
+    <div class="ft-preview">
+      <p class="ft-preview-label">Transação a ser excluída</p>
+      <div class="ft-preview-row">
+        <span class="ft-preview-title">{{ object.title }}</span>
+        <span class="ft-preview-type {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+          {% if object.type == 'income' %}
+            <i class="bi bi-arrow-up"></i> Receita
+          {% else %}
+            <i class="bi bi-arrow-down"></i> Despesa
+          {% endif %}
+        </span>
+      </div>
+      <p class="ft-preview-meta">
+        <i class="bi bi-tag me-1"></i>{{ object.category.name }}
+        &nbsp;·&nbsp;
+        <i class="bi bi-calendar3 me-1"></i>{{ object.date|date:"d/m/Y" }}
+      </p>
+      <p class="ft-preview-amount {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+        {% if object.type == 'income' %}+{% else %}-{% endif %} R$ {{ object.amount }}
+      </p>
+    </div>
+
+    <hr class="ft-divider">
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="ft-actions">
+        <button type="submit" class="btn-ft-danger">
+          <i class="bi bi-trash3"></i> Sim, excluir
+        </button>
+        <a href="{% url 'transaction-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-arrow-left"></i> Cancelar
+        </a>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}

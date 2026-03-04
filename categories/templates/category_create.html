@@ -1,0 +1,221 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Nova Categoria{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ── Page Header ── */
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+    color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  /* ── Breadcrumb ── */
+  .ft-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .78rem;
+    color: var(--ft-muted);
+    margin-bottom: .6rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a {
+    color: var(--ft-text-sub);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  /* ── Form Card ── */
+  .ft-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 640px;
+  }
+
+  /* ── Form Fields ── */
+  .ft-form-group { margin-bottom: 1.4rem; }
+
+  .ft-label {
+    display: block;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--ft-text-sub);
+    margin-bottom: .5rem;
+  }
+  .ft-label span { color: #f44; margin-left: 2px; }
+
+  .ft-input, .ft-textarea {
+    width: 100%;
+    background: var(--ft-bg);
+    border: 1px solid var(--ft-border);
+    border-radius: 10px;
+    color: var(--ft-text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .88rem;
+    padding: .7rem 1rem;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+  }
+  .ft-input::placeholder,
+  .ft-textarea::placeholder { color: var(--ft-muted); }
+
+  .ft-input:focus, .ft-textarea:focus {
+    border-color: var(--ft-accent);
+    box-shadow: 0 0 0 3px rgba(0,229,160,.1);
+  }
+  .ft-textarea { resize: vertical; min-height: 100px; }
+
+  /* Django form errors */
+  .ft-input.is-invalid, .ft-textarea.is-invalid {
+    border-color: #f44;
+    box-shadow: 0 0 0 3px rgba(255,68,68,.1);
+  }
+  .ft-error {
+    font-size: .78rem;
+    color: #f77;
+    margin-top: .35rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+
+  /* ── Divider ── */
+  .ft-divider {
+    border: none;
+    border-top: 1px solid var(--ft-border);
+    margin: 1.75rem 0;
+  }
+
+  /* ── Actions ── */
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-primary {
+    background: var(--ft-accent);
+    border: none;
+    color: #0d0f14;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-primary:hover { opacity: .85; transform: translateY(-1px); color: #0d0f14; }
+  .btn-ft-primary:active { transform: translateY(0); }
+
+  .btn-ft-ghost {
+    background: transparent;
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-ghost:hover {
+    border-color: var(--ft-text-sub);
+    color: var(--ft-text);
+  }
+</style>
+
+<div class="container-fluid px-4">
+
+  <!-- Page Header -->
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'category-list' %}">Categorias</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Nova Categoria</span>
+    </div>
+    <h1><i class="bi bi-tag-fill me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Nova <span>Categoria</span></h1>
+    <p>Preencha os campos abaixo para criar uma nova categoria</p>
+  </div>
+
+  <!-- Form -->
+  <div class="ft-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Nome -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_name">Nome <span>*</span></label>
+        <input
+          type="text"
+          id="id_name"
+          name="name"
+          class="ft-input {% if form.name.errors %}is-invalid{% endif %}"
+          placeholder="Ex: Alimentação, Salário, Transporte..."
+          value="{{ form.name.value|default:'' }}"
+          autofocus
+        >
+        {% if form.name.errors %}
+          {% for error in form.name.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <!-- Descrição -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_description">Descrição</label>
+        <textarea
+          id="id_description"
+          name="description"
+          class="ft-textarea {% if form.description.errors %}is-invalid{% endif %}"
+          placeholder="Descreva brevemente o que esta categoria representa..."
+        >{{ form.description.value|default:'' }}</textarea>
+        {% if form.description.errors %}
+          {% for error in form.description.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        {% endif %}
+      </div>
+
+      <hr class="ft-divider">
+
+      <!-- Actions -->
+      <div class="ft-actions">
+        <button type="submit" class="btn-ft-primary">
+          <i class="bi bi-check-lg"></i> Salvar Categoria
+        </button>
+        <a href="{% url 'category-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+{% endblock %}

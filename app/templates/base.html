@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}FinTrack{% endblock %}</title>
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- Google Fonts -->
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ft-bg:        #0d0f14;
+      --ft-surface:   #161920;
+      --ft-border:    #242832;
+      --ft-accent:    #00e5a0;
+      --ft-accent2:   #3d8bff;
+      --ft-muted:     #52596b;
+      --ft-text:      #e8eaf0;
+      --ft-text-sub:  #8d94a6;
+      --ft-sidebar-w: 240px;
+      --ft-header-h:  60px;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; }
+    html, body { height: 100%; margin: 0; }
+
+    body {
+      background: var(--ft-bg);
+      color: var(--ft-text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--ft-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 3px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--ft-muted); }
+
+    .ft-layout {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+
+    .ft-layout > .ft-header {
+      position: fixed;
+      top: 0; left: 0; right: 0;
+      z-index: 1030;
+      height: var(--ft-header-h);
+    }
+
+    .ft-body {
+      display: flex;
+      flex: 1;
+      margin-top: var(--ft-header-h);
+    }
+
+    /* ── Main — transição sincronizada com sidebar ── */
+    .ft-main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      min-width: 0;
+      margin-left: var(--ft-sidebar-w);
+      transition: margin-left .25s cubic-bezier(.4,0,.2,1);
+    }
+    
+    /* quando a sidebar estiver colapsada */
+    body.sidebar-collapsed .ft-main {
+      margin-left: 64px;
+    }
+    .ft-content {
+      flex: 1;
+      padding: 1.75rem 2rem;
+      overflow-x: hidden;
+      background: var(--ft-bg) !important;
+    }
+    @media (max-width: 991.98px) {
+      .ft-main {
+      margin-left: 0 !important;
+      }
+
+    body.sidebar-collapsed .ft-main {
+      margin-left: 0 !important;
+      }
+
+    .ft-content {
+      padding: 1.25rem 1rem;
+      }
+    }
+
+    body.sidebar-collapsed .ft-main {
+      margin-left: 64px;
+    }
+      .ft-content { padding: 1.25rem 1rem; }
+    
+
+    /* ── Messages ── */
+    .ft-messages { padding: .75rem 2rem 0; }
+    @media (max-width: 991.98px) { .ft-messages { padding: .75rem 1rem 0; } }
+
+    .ft-alert {
+      border-radius: 10px; border: 1px solid;
+      font-family: 'IBM Plex Sans', sans-serif; font-size: .85rem;
+      padding: .7rem 1rem; display: flex; align-items: center; gap: .6rem;
+      animation: ft-slide-in .3s ease;
+    }
+    @keyframes ft-slide-in {
+      from { opacity: 0; transform: translateY(-6px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .ft-alert-success  { background: rgba(0,229,160,.08); border-color: rgba(0,229,160,.25); color: var(--ft-accent); }
+    .ft-alert-danger,
+    .ft-alert-error    { background: rgba(255,68,68,.08); border-color: rgba(255,68,68,.25); color: #f77; }
+    .ft-alert-warning  { background: rgba(245,197,24,.08); border-color: rgba(245,197,24,.25); color: #f5c518; }
+    .ft-alert-info     { background: rgba(61,139,255,.08); border-color: rgba(61,139,255,.25); color: var(--ft-accent2); }
+    .ft-alert .btn-close { filter: invert(1); opacity: .4; margin-left: auto; }
+    .ft-alert .btn-close:hover { opacity: .8; }
+  </style>
+
+  {% block extra_css %}{% endblock %}
+</head>
+
+<body>
+<div class="ft-layout">
+
+  {% include 'components/_header.html' %}
+
+  <div class="ft-body">
+
+    {% include 'components/_sidebar.html' %}
+
+    <div class="ft-main" id="ftMain">
+
+      {% if messages %}
+        <div class="ft-messages">
+          {% for message in messages %}
+            <div class="ft-alert ft-alert-{{ message.tags }} alert-dismissible mb-2" role="alert">
+              {% if message.tags == 'success' %}<i class="bi bi-check-circle-fill"></i>
+              {% elif message.tags == 'danger' or message.tags == 'error' %}<i class="bi bi-x-circle-fill"></i>
+              {% elif message.tags == 'warning' %}<i class="bi bi-exclamation-triangle-fill"></i>
+              {% else %}<i class="bi bi-info-circle-fill"></i>
+              {% endif %}
+              {{ message }}
+              <button type="button" class="btn-close btn-sm" data-bs-dismiss="alert" aria-label="Fechar"></button>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+
+      <main class="ft-content">
+        {% block content %}{% endblock %}
+      </main>
+
+      {% include 'components/_footer.html' %}
+
+    </div>
+  </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

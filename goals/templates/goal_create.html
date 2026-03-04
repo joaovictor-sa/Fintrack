@@ -1,0 +1,243 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Nova Meta{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+    color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  .ft-breadcrumb {
+    display: flex; align-items: center; gap: .5rem;
+    font-size: .78rem; color: var(--ft-muted);
+    margin-bottom: .6rem; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a { color: var(--ft-text-sub); text-decoration: none; transition: color .2s; }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  .ft-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 640px;
+  }
+
+  .ft-form-group { margin-bottom: 1.4rem; }
+  .ft-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.4rem; }
+
+  .ft-label {
+    display: block;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .78rem;
+    font-weight: 700;
+    letter-spacing: .6px;
+    text-transform: uppercase;
+    color: var(--ft-text-sub);
+    margin-bottom: .5rem;
+  }
+  .ft-label span { color: #f44; margin-left: 2px; }
+
+  .ft-input, .ft-select, .ft-textarea {
+    width: 100%;
+    background: var(--ft-bg);
+    border: 1px solid var(--ft-border);
+    border-radius: 10px;
+    color: var(--ft-text);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .88rem;
+    padding: .7rem 1rem;
+    transition: border-color .2s, box-shadow .2s;
+    outline: none;
+    appearance: none;
+  }
+  .ft-input::placeholder, .ft-textarea::placeholder { color: var(--ft-muted); }
+  .ft-input:focus, .ft-select:focus, .ft-textarea:focus {
+    border-color: var(--ft-accent);
+    box-shadow: 0 0 0 3px rgba(0,229,160,.1);
+  }
+  .ft-select { cursor: pointer; }
+  .ft-textarea { resize: vertical; min-height: 90px; }
+
+  .ft-input.is-invalid, .ft-select.is-invalid, .ft-textarea.is-invalid {
+    border-color: #f44;
+    box-shadow: 0 0 0 3px rgba(255,68,68,.1);
+  }
+  .ft-error { font-size: .78rem; color: #f77; margin-top: .35rem; font-family: 'IBM Plex Sans', sans-serif; }
+
+  /* amount prefix */
+  .ft-input-group { display: flex; }
+  .ft-input-prefix {
+    background: #1e2130;
+    border: 1px solid var(--ft-border);
+    border-right: none;
+    border-radius: 10px 0 0 10px;
+    color: var(--ft-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    padding: .7rem 1rem;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+  }
+  .ft-input-group .ft-input { border-radius: 0 10px 10px 0; }
+
+  .ft-divider { border: none; border-top: 1px solid var(--ft-border); margin: 1.75rem 0; }
+
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-primary {
+    background: var(--ft-accent);
+    border: none;
+    color: #0d0f14;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-primary:hover { opacity: .85; transform: translateY(-1px); color: #0d0f14; }
+
+  .btn-ft-ghost {
+    background: transparent;
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-ghost:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+</style>
+
+<div class="container-fluid px-4">
+
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'goal-list' %}">Metas</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Nova Meta</span>
+    </div>
+    <h1><i class="bi bi-bullseye me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Nova <span>Meta</span></h1>
+    <p>Defina um limite de gasto para uma categoria em um mês específico</p>
+  </div>
+
+  <div class="ft-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      <!-- Categoria -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_category">Categoria <span>*</span></label>
+        <select id="id_category" name="category" class="ft-select {% if form.category.errors %}is-invalid{% endif %}">
+          <option value="">Selecione uma categoria...</option>
+          {% for cat in form.category.field.queryset %}
+            <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+        {% for error in form.category.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Limite -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_limit_amount">Limite de Gasto <span>*</span></label>
+        <div class="ft-input-group">
+          <span class="ft-input-prefix">R$</span>
+          <input type="number" id="id_limit_amount" name="limit_amount"
+            class="ft-input {% if form.limit_amount.errors %}is-invalid{% endif %}"
+            placeholder="0,00" step="0.01" min="0"
+            value="{{ form.limit_amount.value|default:'' }}">
+        </div>
+        {% for error in form.limit_amount.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Mês e Ano -->
+      <div class="ft-form-row">
+        <div>
+          <label class="ft-label" for="id_month">Mês <span>*</span></label>
+          <select id="id_month" name="month" class="ft-select {% if form.month.errors %}is-invalid{% endif %}">
+            {% for value, label in form.month.field.choices %}
+              <option value="{{ value }}" {% if form.month.value|stringformat:"s" == value|stringformat:"s" %}selected{% endif %}>
+                {{ label }}
+              </option>
+            {% endfor %}
+          </select>
+          {% for error in form.month.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        </div>
+
+        <div>
+          <label class="ft-label" for="id_year">Ano <span>*</span></label>
+          <input type="number" id="id_year" name="year"
+            class="ft-input {% if form.year.errors %}is-invalid{% endif %}"
+            placeholder="2026" min="2020" max="2100"
+            value="{{ form.year.value|default:'' }}">
+          {% for error in form.year.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Descrição -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_description">Descrição</label>
+        <textarea id="id_description" name="description"
+          class="ft-textarea {% if form.description.errors %}is-invalid{% endif %}"
+          placeholder="Ex: Reduzir gastos com delivery este mês...">{{ form.description.value|default:'' }}</textarea>
+        {% for error in form.description.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-actions">
+        <button type="submit" class="btn-ft-primary">
+          <i class="bi bi-check-lg"></i> Salvar Meta
+        </button>
+        <a href="{% url 'goal-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+{% endblock %}

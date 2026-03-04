@@ -1,0 +1,260 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Excluir Categoria{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ── Page Header ── */
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+    color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: #f55; }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  /* ── Breadcrumb ── */
+  .ft-breadcrumb {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    font-size: .78rem;
+    color: var(--ft-muted);
+    margin-bottom: .6rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a {
+    color: var(--ft-text-sub);
+    text-decoration: none;
+    transition: color .2s;
+  }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  /* ── Confirm Card ── */
+  .ft-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    padding: 2rem;
+    max-width: 540px;
+  }
+
+  /* ── Danger zone header ── */
+  .ft-danger-header {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.25rem;
+    background: rgba(255,68,68,.06);
+    border: 1px solid rgba(255,68,68,.2);
+    border-radius: 12px;
+    margin-bottom: 1.75rem;
+  }
+  .ft-danger-icon {
+    display: inline-flex;
+    align-items: center; justify-content: center;
+    width: 44px; height: 44px;
+    background: rgba(255,68,68,.12);
+    border-radius: 12px;
+    color: #f55;
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+  .ft-danger-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .95rem;
+    color: var(--ft-text);
+    margin: 0 0 .2rem;
+  }
+  .ft-danger-sub {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .8rem;
+    color: var(--ft-text-sub);
+    margin: 0;
+  }
+
+  /* ── Category preview ── */
+  .ft-preview {
+    background: var(--ft-bg);
+    border: 1px solid var(--ft-border);
+    border-radius: 10px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.75rem;
+  }
+  .ft-preview-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .7rem;
+    font-weight: 700;
+    letter-spacing: .8px;
+    text-transform: uppercase;
+    color: var(--ft-muted);
+    margin-bottom: .6rem;
+  }
+  .ft-preview-name {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: 1rem;
+    color: var(--ft-text);
+    margin-bottom: .35rem;
+  }
+  .ft-preview-name .cat-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    background: #f55;
+    flex-shrink: 0;
+  }
+  .ft-preview-desc {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .82rem;
+    color: var(--ft-text-sub);
+    margin: 0;
+    padding-left: 1.35rem;
+  }
+
+  /* ── Warning note ── */
+  .ft-warning-note {
+    display: flex;
+    align-items: flex-start;
+    gap: .6rem;
+    background: rgba(245,197,24,.06);
+    border: 1px solid rgba(245,197,24,.2);
+    border-radius: 10px;
+    padding: .85rem 1rem;
+    margin-bottom: 1.75rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .8rem;
+    color: #f5c518;
+    line-height: 1.5;
+  }
+  .ft-warning-note i { margin-top: 1px; flex-shrink: 0; }
+
+  /* ── Divider ── */
+  .ft-divider {
+    border: none;
+    border-top: 1px solid var(--ft-border);
+    margin: 1.5rem 0;
+  }
+
+  /* ── Actions ── */
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-danger {
+    background: #d93636;
+    border: none;
+    color: #fff;
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    cursor: pointer;
+    transition: background .2s, transform .15s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-danger:hover { background: #c02e2e; transform: translateY(-1px); color: #fff; }
+  .btn-ft-danger:active { transform: translateY(0); }
+
+  .btn-ft-ghost {
+    background: transparent;
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .65rem 1.5rem;
+    cursor: pointer;
+    transition: all .2s;
+    display: inline-flex;
+    align-items: center;
+    gap: .45rem;
+    text-decoration: none;
+  }
+  .btn-ft-ghost:hover {
+    border-color: var(--ft-text-sub);
+    color: var(--ft-text);
+  }
+</style>
+
+<div class="container-fluid px-4">
+
+  <!-- Page Header -->
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'category-list' %}">Categorias</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Excluir</span>
+    </div>
+    <h1><i class="bi bi-trash3-fill me-2" style="color:#f55;font-size:1.4rem;"></i>Excluir <span>Categoria</span></h1>
+    <p>Esta ação não poderá ser desfeita</p>
+  </div>
+
+  <!-- Confirm Card -->
+  <div class="ft-card">
+
+    <!-- Danger header -->
+    <div class="ft-danger-header">
+      <span class="ft-danger-icon">
+        <i class="bi bi-exclamation-triangle-fill"></i>
+      </span>
+      <div>
+        <p class="ft-danger-title">Confirmar exclusão</p>
+        <p class="ft-danger-sub">Você está prestes a excluir permanentemente esta categoria.</p>
+      </div>
+    </div>
+
+    <!-- Category preview -->
+    <div class="ft-preview">
+      <p class="ft-preview-label">Categoria a ser excluída</p>
+      <div class="ft-preview-name">
+        <span class="cat-dot"></span>
+        {{ object.name }}
+      </div>
+      {% if object.description %}
+        <p class="ft-preview-desc">{{ object.description }}</p>
+      {% endif %}
+    </div>
+
+    <!-- Warning -->
+    <div class="ft-warning-note">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      Ao excluir esta categoria, todas as transações vinculadas a ela poderão ser afetadas. Verifique antes de continuar.
+    </div>
+
+    <hr class="ft-divider">
+
+    <!-- Actions -->
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="ft-actions">
+        <button type="submit" class="btn-ft-danger">
+          <i class="bi bi-trash3"></i> Sim, excluir
+        </button>
+        <a href="{% url 'category-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-arrow-left"></i> Cancelar
+        </a>
+      </div>
+    </form>
+
+  </div>
+
+</div>
+
+{% endblock %}

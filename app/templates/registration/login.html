@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FinTrack — Login</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --ft-bg:       #0d0f14;
+      --ft-surface:  #161920;
+      --ft-border:   #242832;
+      --ft-accent:   #00e5a0;
+      --ft-accent2:  #3d8bff;
+      --ft-muted:    #52596b;
+      --ft-text:     #e8eaf0;
+      --ft-text-sub: #8d94a6;
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html, body {
+      height: 100%;
+      background: var(--ft-bg);
+      color: var(--ft-text);
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+
+    .ft-wrapper {
+      display: flex;
+      height: 100vh;
+      min-height: 100vh;
+    }
+
+    /* ── Left panel ── */
+    .ft-left {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .ft-left::before {
+      content: '';
+      position: absolute; top: -300px; left: -300px;
+      width: 800px; height: 800px;
+      background: radial-gradient(circle, rgba(0,229,160,.08) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .ft-login-wrap {
+      width: 100%;
+      max-width: 460px;
+      position: relative;
+      z-index: 1;
+    }
+
+    /* Logo */
+    .ft-logo {
+      display: flex; align-items: center; gap: 1rem;
+      margin-bottom: 3.5rem;
+    }
+    .ft-logo-icon {
+      width: 52px; height: 52px;
+      background: linear-gradient(135deg, var(--ft-accent), #00b37a);
+      border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.4rem; color: #0d0f14; flex-shrink: 0;
+    }
+    .ft-logo-name {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 1.9rem;
+      color: var(--ft-text); letter-spacing: -.5px; line-height: 1;
+    }
+    .ft-logo-name span { color: var(--ft-accent); }
+    .ft-logo-sub {
+      font-size: .75rem; color: var(--ft-muted);
+      margin-top: .2rem;
+    }
+
+    /* Heading */
+    .ft-heading {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 2rem;
+      letter-spacing: -.5px; color: var(--ft-text);
+      margin-bottom: .6rem; line-height: 1.2;
+    }
+    .ft-subheading {
+      font-size: .95rem; color: var(--ft-text-sub);
+      margin-bottom: 2.5rem; line-height: 1.5;
+    }
+
+    /* Fields */
+    .ft-field { margin-bottom: 1.5rem; }
+
+    .ft-label {
+      display: block;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-size: .75rem; font-weight: 700;
+      letter-spacing: .8px; text-transform: uppercase;
+      color: var(--ft-text-sub); margin-bottom: .5rem;
+    }
+
+    .ft-input-wrap { position: relative; }
+
+    .ft-input-icon {
+      position: absolute; left: 1.1rem; top: 50%;
+      transform: translateY(-50%);
+      color: var(--ft-muted); font-size: 1.05rem;
+      pointer-events: none;
+    }
+
+    .ft-input {
+      width: 100%;
+      background: var(--ft-surface);
+      border: 1.5px solid var(--ft-border);
+      border-radius: 12px;
+      color: var(--ft-text);
+      font-family: 'IBM Plex Sans', sans-serif;
+      font-size: .95rem;
+      padding: .9rem 1rem .9rem 3rem;
+      outline: none;
+      transition: border-color .2s, box-shadow .2s;
+    }
+    .ft-input::placeholder { color: var(--ft-muted); }
+    .ft-input:focus {
+      border-color: var(--ft-accent);
+      box-shadow: 0 0 0 3px rgba(0,229,160,.1);
+    }
+    .ft-input.is-invalid {
+      border-color: #f44;
+      box-shadow: 0 0 0 3px rgba(255,68,68,.1);
+    }
+
+    .ft-pwd-toggle {
+      position: absolute; right: 1.1rem; top: 50%;
+      transform: translateY(-50%);
+      background: none; border: none;
+      color: var(--ft-muted); cursor: pointer;
+      font-size: 1.05rem; padding: 0;
+      transition: color .2s;
+    }
+    .ft-pwd-toggle:hover { color: var(--ft-text); }
+
+    /* Error */
+    .ft-error-box {
+      background: rgba(255,68,68,.08);
+      border: 1px solid rgba(255,68,68,.25);
+      border-radius: 10px;
+      padding: .9rem 1.1rem;
+      margin-bottom: 2rem;
+      font-size: .875rem; color: #f77;
+      display: flex; align-items: center; gap: .6rem;
+    }
+
+    /* Button */
+    .btn-login {
+      width: 100%;
+      background: var(--ft-accent);
+      border: none; color: #0d0f14;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 700; font-size: 1rem;
+      border-radius: 12px;
+      padding: 1rem;
+      cursor: pointer;
+      transition: opacity .2s, transform .15s;
+      display: flex; align-items: center;
+      justify-content: center; gap: .5rem;
+      margin-top: .5rem;
+    }
+    .btn-login:hover { opacity: .88; transform: translateY(-1px); }
+    .btn-login:active { transform: translateY(0); }
+
+    .ft-footer {
+      margin-top: 2.5rem;
+      font-size: .8rem; color: var(--ft-muted);
+    }
+
+    /* ── Right panel ── */
+    .ft-right {
+      width: 45%;
+      background: var(--ft-surface);
+      border-left: 1px solid var(--ft-border);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 4rem 3.5rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 960px) { .ft-right { display: none; } }
+
+    .ft-right::before {
+      content: '';
+      position: absolute; top: 50%; left: 50%;
+      transform: translate(-50%, -50%);
+      width: 600px; height: 600px;
+      background: radial-gradient(circle, rgba(0,229,160,.07) 0%, transparent 65%);
+      pointer-events: none;
+    }
+    .ft-right::after {
+      content: '';
+      position: absolute; bottom: -200px; right: -200px;
+      width: 500px; height: 500px;
+      background: radial-gradient(circle, rgba(61,139,255,.06) 0%, transparent 65%);
+      pointer-events: none;
+    }
+
+    .ft-right-inner {
+      position: relative; z-index: 1;
+      text-align: center; max-width: 380px;
+    }
+
+    .ft-right-icon {
+      width: 100px; height: 100px;
+      background: linear-gradient(135deg, rgba(0,229,160,.15), rgba(0,229,160,.04));
+      border: 1px solid rgba(0,229,160,.2);
+      border-radius: 28px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 2.75rem; color: var(--ft-accent);
+      margin: 0 auto 2.5rem;
+    }
+
+    .ft-right-title {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 800; font-size: 2rem;
+      color: var(--ft-text); letter-spacing: -.5px;
+      margin-bottom: .75rem; line-height: 1.2;
+    }
+    .ft-right-title span { color: var(--ft-accent); }
+
+    .ft-right-sub {
+      font-size: .92rem; color: var(--ft-text-sub);
+      line-height: 1.65; margin-bottom: 3rem;
+    }
+
+    .ft-feature {
+      display: flex; align-items: flex-start; gap: 1rem;
+      text-align: left; margin-bottom: 1.4rem;
+    }
+    .ft-feature-dot {
+      width: 38px; height: 38px; border-radius: 10px; flex-shrink: 0;
+      background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--ft-accent); font-size: .95rem;
+    }
+    .ft-feature strong {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600; font-size: .9rem;
+      color: var(--ft-text); display: block; margin-bottom: .2rem;
+    }
+    .ft-feature p {
+      font-size: .83rem; color: var(--ft-text-sub);
+      margin: 0; line-height: 1.4;
+    }
+
+    ::-webkit-scrollbar { width: 6px; }
+    ::-webkit-scrollbar-track { background: var(--ft-bg); }
+    ::-webkit-scrollbar-thumb { background: var(--ft-border); border-radius: 3px; }
+  </style>
+</head>
+
+<body>
+<div class="ft-wrapper">
+
+  <!-- ── Left ── -->
+  <div class="ft-left">
+    <div class="ft-login-wrap">
+
+      <div class="ft-logo">
+        <div class="ft-logo-icon"><i class="bi bi-graph-up-arrow"></i></div>
+        <div>
+          <div class="ft-logo-name">Fin<span>Track</span></div>
+          <div class="ft-logo-sub">Sistema de Gerenciamento de Finanças</div>
+        </div>
+      </div>
+
+      <h1 class="ft-heading">Bem-vindo de volta</h1>
+      <p class="ft-subheading">Faça login para acessar seu painel financeiro</p>
+
+      {% if form.errors %}
+        <div class="ft-error-box">
+          <i class="bi bi-exclamation-triangle-fill"></i>
+          Usuário ou senha inválidos. Tente novamente.
+        </div>
+      {% endif %}
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+
+        <div class="ft-field">
+          <label class="ft-label" for="id_username">Usuário</label>
+          <div class="ft-input-wrap">
+            <i class="bi bi-person ft-input-icon"></i>
+            <input type="text" id="id_username" name="username"
+              class="ft-input {% if form.username.errors %}is-invalid{% endif %}"
+              placeholder="Seu usuário"
+              value="{{ form.username.value|default:'' }}"
+              autofocus autocomplete="username">
+          </div>
+        </div>
+
+        <div class="ft-field">
+          <label class="ft-label" for="id_password">Senha</label>
+          <div class="ft-input-wrap">
+            <i class="bi bi-lock ft-input-icon"></i>
+            <input type="password" id="id_password" name="password"
+              class="ft-input {% if form.password.errors %}is-invalid{% endif %}"
+              placeholder="Sua senha"
+              autocomplete="current-password">
+            <button type="button" class="ft-pwd-toggle" onclick="togglePwd()">
+              <i class="bi bi-eye" id="pwdIcon"></i>
+            </button>
+          </div>
+        </div>
+
+        {% if next %}<input type="hidden" name="next" value="{{ next }}">{% endif %}
+
+        <button type="submit" class="btn-login">
+          <i class="bi bi-box-arrow-in-right"></i> Entrar
+        </button>
+      </form>
+
+      <p class="ft-footer">FinTrack © {% now "Y" %} — Todos os direitos reservados</p>
+
+    </div>
+  </div>
+
+  <!-- ── Right ── -->
+  <div class="ft-right">
+    <div class="ft-right-inner">
+
+      <div class="ft-right-icon">
+        <i class="bi bi-bar-chart-line"></i>
+      </div>
+
+      <h2 class="ft-right-title">Controle suas<br><span>finanças</span></h2>
+      <p class="ft-right-sub">Acompanhe receitas, despesas e metas em um só lugar com clareza e simplicidade.</p>
+
+      <div class="ft-feature">
+        <div class="ft-feature-dot"><i class="bi bi-graph-up"></i></div>
+        <div>
+          <strong>Dashboard em tempo real</strong>
+          <p>Visão completa do seu mês financeiro com gráficos</p>
+        </div>
+      </div>
+
+      <div class="ft-feature">
+        <div class="ft-feature-dot"><i class="bi bi-bullseye"></i></div>
+        <div>
+          <strong>Controle de metas</strong>
+          <p>Defina limites por categoria e seja alertado ao ultrapassar</p>
+        </div>
+      </div>
+
+      <div class="ft-feature">
+        <div class="ft-feature-dot"><i class="bi bi-arrow-left-right"></i></div>
+        <div>
+          <strong>Registro de transações</strong>
+          <p>Organize receitas e despesas por categoria e data</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<script>
+  function togglePwd() {
+    const input = document.getElementById('id_password');
+    const icon  = document.getElementById('pwdIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('bi-eye', 'bi-eye-slash');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('bi-eye-slash', 'bi-eye');
+    }
+  }
+</script>
+</body>
+</html>

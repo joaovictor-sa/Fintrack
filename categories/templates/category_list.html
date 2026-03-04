@@ -1,0 +1,307 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Categorias{% endblock %}
+
+{% block content %}
+
+<style>
+  /* ── page header ── */
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800;
+    font-size: 1.9rem;
+    letter-spacing: -0.5px;
+    color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  /* ── search bar ── */
+  .ft-search-wrap .form-control {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text);
+    border-radius: 10px 0 0 10px;
+    padding: .6rem 1rem;
+    font-size: .88rem;
+    transition: border-color .2s;
+  }
+  .ft-search-wrap .form-control::placeholder { color: var(--ft-muted); }
+  .ft-search-wrap .form-control:focus {
+    border-color: var(--ft-accent);
+    box-shadow: 0 0 0 3px rgba(0,229,160,.12);
+    background: var(--ft-surface);
+    color: var(--ft-text);
+  }
+  .ft-search-wrap .btn-search {
+    background: var(--ft-accent);
+    border: none;
+    color: #0d0f14;
+    font-weight: 600;
+    border-radius: 0 10px 10px 0;
+    padding: .6rem 1.1rem;
+    transition: opacity .2s;
+    cursor: pointer;
+  }
+  .ft-search-wrap .btn-search:hover { opacity: .85; }
+
+  /* ── new-category button ── */
+  .btn-new-cat {
+    background: transparent;
+    border: 1.5px solid var(--ft-accent);
+    color: var(--ft-accent);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .85rem;
+    border-radius: 10px;
+    padding: .55rem 1.2rem;
+    transition: background .2s, color .2s;
+    white-space: nowrap;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: .35rem;
+  }
+  .btn-new-cat:hover { background: var(--ft-accent); color: #0d0f14; }
+
+  /* ── table card ── */
+  .ft-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+
+  .ft-table {
+    margin: 0;
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .ft-table thead th {
+    background: #1e2130;
+    color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600;
+    font-size: .75rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    border: none;
+    padding: 1rem 1.25rem;
+  }
+
+  .ft-table tbody tr {
+    border-bottom: 1px solid var(--ft-border);
+    background: var(--ft-surface);
+    transition: background .15s;
+  }
+  .ft-table tbody tr:last-child { border-bottom: none; }
+  .ft-table tbody tr:hover { background: #1c2030; }
+
+  .ft-table td {
+    padding: 1rem 1.25rem;
+    vertical-align: middle;
+    border: none;
+    font-size: .88rem;
+    color: var(--ft-text);
+    background: transparent;
+  }
+
+  /* ID badge */
+  .id-badge {
+    display: inline-block;
+    background: rgba(61,139,255,.12);
+    color: var(--ft-accent2);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .75rem;
+    font-weight: 700;
+    padding: .15rem .55rem;
+    border-radius: 6px;
+    letter-spacing: .5px;
+  }
+
+  /* category name */
+  .cat-name {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    color: var(--ft-text);
+  }
+  .cat-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    background: var(--ft-accent);
+    flex-shrink: 0;
+  }
+
+  /* description */
+  .cat-desc { color: var(--ft-text-sub); font-size: .84rem; }
+
+  /* action buttons */
+  .btn-act {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px; height: 32px;
+    border-radius: 8px;
+    border: 1px solid var(--ft-border);
+    background: transparent;
+    font-size: .85rem;
+    transition: all .18s;
+    text-decoration: none;
+  }
+  .btn-act-view  { color: var(--ft-accent2); }
+  .btn-act-view:hover  { background: rgba(61,139,255,.15); border-color: var(--ft-accent2); color: var(--ft-accent2); }
+  .btn-act-edit  { color: #f5c518; }
+  .btn-act-edit:hover  { background: rgba(245,197,24,.12); border-color: #f5c518; color: #f5c518; }
+  .btn-act-del   { color: #f44; }
+  .btn-act-del:hover   { background: rgba(255,68,68,.12); border-color: #f44; color: #f44; }
+
+  /* empty state */
+  .ft-empty {
+    padding: 4rem 2rem;
+    text-align: center;
+    background: var(--ft-surface);
+  }
+  .ft-empty i { font-size: 2.5rem; margin-bottom: 1rem; display: block; opacity: .4; color: var(--ft-muted); }
+  .ft-empty p { font-size: .9rem; margin: 0; color: var(--ft-muted); }
+
+  /* pagination */
+  .ft-pagination .page-link {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    color: var(--ft-text-sub);
+    border-radius: 8px;
+    padding: .4rem .75rem;
+    font-size: .83rem;
+    transition: all .2s;
+    margin: 0 2px;
+  }
+  .ft-pagination .page-link:hover,
+  .ft-pagination .page-item.active .page-link {
+    background: var(--ft-accent);
+    border-color: var(--ft-accent);
+    color: #0d0f14;
+    font-weight: 600;
+  }
+  .ft-pagination .page-item.disabled .page-link { opacity: .35; }
+</style>
+
+<div class="container-fluid px-4">
+
+  <!-- Page Header -->
+  <div class="ft-page-header d-flex align-items-end justify-content-between flex-wrap gap-3">
+    <div>
+      <h1><i class="bi bi-tag-fill me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Cate<span>gorias</span></h1>
+      <p>Organize suas receitas e despesas em categorias personalizadas</p>
+    </div>
+  </div>
+
+  <!-- Toolbar -->
+  <div class="d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <form method="get" action="{% url 'category-list' %}" class="ft-search-wrap d-flex" style="max-width:340px;width:100%;">
+      <input type="text" class="form-control" name="name"
+             placeholder="Buscar categoria..." value="{{ request.GET.name }}">
+      <button type="submit" class="btn-search">
+        <i class="bi bi-search"></i>
+      </button>
+    </form>
+
+    <a href="{% url 'category-create' %}" class="btn-new-cat">
+      <i class="bi bi-plus-lg"></i> Nova Categoria
+    </a>
+  </div>
+
+  <!-- Table -->
+  <div class="ft-card">
+    <div style="overflow-x:auto;">
+      <table class="ft-table">
+        <thead>
+          <tr>
+            <th style="width:80px;">#</th>
+            <th>Nome</th>
+            <th>Descrição</th>
+            <th style="width:120px;text-align:center;">Ações</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for category in categories %}
+          <tr>
+            <td><span class="id-badge">{{ category.id }}</span></td>
+            <td>
+              <div class="cat-name">
+                <span class="cat-dot"></span>
+                {{ category.name }}
+              </div>
+            </td>
+            <td><span class="cat-desc">{{ category.description|default:"—" }}</span></td>
+            <td>
+              <div style="display:flex;align-items:center;justify-content:center;gap:4px;">
+                <a href="{% url 'category-detail' category.id %}" class="btn-act btn-act-view" title="Ver detalhes">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a href="{% url 'category-update' category.id %}" class="btn-act btn-act-edit" title="Editar">
+                  <i class="bi bi-pencil"></i>
+                </a>
+                <a href="{% url 'category-delete' category.id %}" class="btn-act btn-act-del" title="Excluir">
+                  <i class="bi bi-trash3"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="4">
+              <div class="ft-empty">
+                <i class="bi bi-inbox"></i>
+                <p>Nenhuma categoria encontrada.<br>
+                  <a href="{% url 'category-create' %}" style="color:var(--ft-accent);">Criar a primeira categoria</a>
+                </p>
+              </div>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  {% if is_paginated %}
+  <div class="d-flex justify-content-center mt-4">
+    <nav>
+      <ul class="pagination ft-pagination mb-0">
+        {% if page_obj.has_previous %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.name %}&name={{ request.GET.name }}{% endif %}">
+              <i class="bi bi-chevron-left"></i>
+            </a>
+          </li>
+        {% endif %}
+        {% for num in page_obj.paginator.page_range %}
+          <li class="page-item {% if page_obj.number == num %}active{% endif %}">
+            <a class="page-link" href="?page={{ num }}{% if request.GET.name %}&name={{ request.GET.name }}{% endif %}">{{ num }}</a>
+          </li>
+        {% endfor %}
+        {% if page_obj.has_next %}
+          <li class="page-item">
+            <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.name %}&name={{ request.GET.name }}{% endif %}">
+              <i class="bi bi-chevron-right"></i>
+            </a>
+          </li>
+        {% endif %}
+      </ul>
+    </nav>
+  </div>
+  {% endif %}
+
+</div>
+
+{% endblock %}

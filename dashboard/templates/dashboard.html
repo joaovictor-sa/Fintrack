@@ -1,0 +1,384 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Dashboard{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2rem 0 1.5rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 1.9rem;
+    letter-spacing: -0.5px; color: var(--ft-text); margin: 0 0 .25rem;
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  /* ── Summary Cards ── */
+  .ft-cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 768px) { .ft-cards-grid { grid-template-columns: 1fr; } }
+
+  .ft-sum-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .ft-sum-card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3px;
+  }
+  .ft-sum-card.income::before  { background: var(--ft-accent); }
+  .ft-sum-card.expense::before { background: #f55; }
+  .ft-sum-card.balance::before { background: var(--ft-accent2); }
+
+  .ft-sum-label {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .72rem; font-weight: 700;
+    letter-spacing: 1px; text-transform: uppercase;
+    color: var(--ft-muted); margin-bottom: .75rem;
+    display: flex; align-items: center; gap: .4rem;
+  }
+  .ft-sum-value {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 1.75rem;
+    letter-spacing: -.5px; margin: 0;
+  }
+  .ft-sum-card.income  .ft-sum-value { color: var(--ft-accent); }
+  .ft-sum-card.expense .ft-sum-value { color: #f55; }
+  .ft-sum-card.balance .ft-sum-value { color: {% if saldo >= 0 %}var(--ft-accent){% else %}#f55{% endif %}; }
+
+  .ft-sum-icon {
+    position: absolute; right: 1.25rem; top: 50%;
+    transform: translateY(-50%);
+    font-size: 2.5rem; opacity: .07;
+  }
+
+  /* ── Charts row ── */
+  .ft-charts-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+    margin-bottom: 2rem;
+  }
+  @media (max-width: 900px) { .ft-charts-grid { grid-template-columns: 1fr; } }
+
+  .ft-chart-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    padding: 1.5rem;
+  }
+  .ft-chart-title {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: .9rem;
+    color: var(--ft-text); margin-bottom: 1.25rem;
+    display: flex; align-items: center; gap: .5rem;
+  }
+  .ft-chart-title i { color: var(--ft-accent); }
+
+  /* ── Bottom grid ── */
+  .ft-bottom-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.25rem;
+  }
+  @media (max-width: 900px) { .ft-bottom-grid { grid-template-columns: 1fr; } }
+
+  .ft-section-card {
+    background: var(--ft-surface);
+    border: 1px solid var(--ft-border);
+    border-radius: 16px;
+    overflow: hidden;
+  }
+  .ft-section-header {
+    padding: 1.25rem 1.5rem;
+    border-bottom: 1px solid var(--ft-border);
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: .9rem; color: var(--ft-text);
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .ft-section-header a {
+    font-size: .75rem; font-weight: 500;
+    color: var(--ft-accent); text-decoration: none;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-section-header a:hover { opacity: .8; }
+
+  /* ── Recent transactions ── */
+  .ft-tx-item {
+    display: flex; align-items: center;
+    padding: .85rem 1.5rem;
+    border-bottom: 1px solid var(--ft-border);
+    gap: 1rem; transition: background .15s;
+  }
+  .ft-tx-item:last-child { border-bottom: none; }
+  .ft-tx-item:hover { background: rgba(255,255,255,.02); }
+
+  .ft-tx-dot {
+    width: 36px; height: 36px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; font-size: .9rem;
+  }
+  .ft-tx-dot.income  { background: rgba(0,229,160,.1); color: var(--ft-accent); }
+  .ft-tx-dot.expense { background: rgba(255,68,68,.1); color: #f55; }
+
+  .ft-tx-info { flex: 1; min-width: 0; }
+  .ft-tx-title {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600;
+    font-size: .85rem; color: var(--ft-text);
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .ft-tx-meta { font-family: 'IBM Plex Sans', sans-serif; font-size: .75rem; color: var(--ft-muted); }
+
+  .ft-tx-amount {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 700; font-size: .88rem; flex-shrink: 0;
+  }
+  .ft-tx-amount.income  { color: var(--ft-accent); }
+  .ft-tx-amount.expense { color: #f55; }
+
+  /* ── Goals progress ── */
+  .ft-goal-item {
+    padding: 1rem 1.5rem;
+    border-bottom: 1px solid var(--ft-border);
+  }
+  .ft-goal-item:last-child { border-bottom: none; }
+
+  .ft-goal-row {
+    display: flex; align-items: center;
+    justify-content: space-between; margin-bottom: .5rem;
+  }
+  .ft-goal-cat {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600; font-size: .84rem; color: var(--ft-text);
+  }
+  .ft-goal-vals {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .78rem; color: var(--ft-text-sub);
+  }
+
+  .ft-progress {
+    height: 6px; background: var(--ft-border);
+    border-radius: 99px; overflow: hidden;
+  }
+  .ft-progress-bar {
+    height: 100%; border-radius: 99px;
+    transition: width .6s ease;
+  }
+  .ft-progress-bar.ok       { background: var(--ft-accent); }
+  .ft-progress-bar.warning  { background: #f5c518; }
+  .ft-progress-bar.danger   { background: #f55; }
+
+  .ft-goal-pct {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .72rem; font-weight: 700;
+    margin-top: .35rem; text-align: right;
+  }
+  .ft-goal-pct.ok      { color: var(--ft-accent); }
+  .ft-goal-pct.warning { color: #f5c518; }
+  .ft-goal-pct.danger  { color: #f55; }
+
+  .ft-empty-state {
+    padding: 2.5rem; text-align: center;
+    color: var(--ft-muted); font-size: .85rem;
+    font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-empty-state i { display: block; font-size: 1.75rem; margin-bottom: .5rem; opacity: .3; }
+</style>
+
+<div class="container-fluid px-4">
+
+  <!-- Header -->
+  <div class="ft-page-header">
+    <h1><i class="bi bi-speedometer2 me-2" style="color:var(--ft-accent);font-size:1.6rem;"></i>Dash<span>board</span></h1>
+    <p>Resumo financeiro de {{ mes_atual }}</p>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="ft-cards-grid">
+    <div class="ft-sum-card income">
+      <p class="ft-sum-label"><i class="bi bi-arrow-up-circle"></i> Receitas</p>
+      <p class="ft-sum-value">R$ {{ receitas }}</p>
+      <i class="bi bi-arrow-up-circle ft-sum-icon"></i>
+    </div>
+    <div class="ft-sum-card expense">
+      <p class="ft-sum-label"><i class="bi bi-arrow-down-circle"></i> Despesas</p>
+      <p class="ft-sum-value">R$ {{ despesas }}</p>
+      <i class="bi bi-arrow-down-circle ft-sum-icon"></i>
+    </div>
+    <div class="ft-sum-card balance">
+      <p class="ft-sum-label"><i class="bi bi-wallet2"></i> Saldo</p>
+      <p class="ft-sum-value">R$ {{ saldo }}</p>
+      <i class="bi bi-wallet2 ft-sum-icon"></i>
+    </div>
+  </div>
+
+  <!-- Charts -->
+  <div class="ft-charts-grid">
+    <div class="ft-chart-card">
+      <p class="ft-chart-title"><i class="bi bi-bar-chart"></i> Receitas vs Despesas</p>
+      <canvas id="chartBar" height="200"></canvas>
+    </div>
+    <div class="ft-chart-card">
+      <p class="ft-chart-title"><i class="bi bi-pie-chart"></i> Despesas por Categoria</p>
+      <canvas id="chartPie" height="200"></canvas>
+    </div>
+  </div>
+
+  <!-- Bottom: Recent + Goals -->
+  <div class="ft-bottom-grid">
+
+    <!-- Últimas transações -->
+    <div class="ft-section-card">
+      <div class="ft-section-header">
+        <span><i class="bi bi-clock-history me-2" style="color:var(--ft-accent);"></i>Últimas Transações</span>
+        <a href="{% url 'transaction-list' %}">Ver todas →</a>
+      </div>
+      {% for tx in ultimas %}
+        <div class="ft-tx-item">
+          <span class="ft-tx-dot {{ tx.type }}">
+            <i class="bi {% if tx.type == 'income' %}bi-arrow-up{% else %}bi-arrow-down{% endif %}"></i>
+          </span>
+          <div class="ft-tx-info">
+            <p class="ft-tx-title">{{ tx.title }}</p>
+            <p class="ft-tx-meta">{{ tx.category.name }} · {{ tx.date|date:"d/m/Y" }}</p>
+          </div>
+          <span class="ft-tx-amount {{ tx.type }}">
+            {% if tx.type == 'income' %}+{% else %}-{% endif %} R$ {{ tx.amount }}
+          </span>
+        </div>
+      {% empty %}
+        <div class="ft-empty-state">
+          <i class="bi bi-inbox"></i>
+          Nenhuma transação registrada este mês.
+        </div>
+      {% endfor %}
+    </div>
+
+    <!-- Metas do mês -->
+    <div class="ft-section-card">
+      <div class="ft-section-header">
+        <span><i class="bi bi-bullseye me-2" style="color:var(--ft-accent);"></i>Metas do Mês</span>
+        <a href="{% url 'goal-list' %}">Ver todas →</a>
+      </div>
+      {% for m in metas %}
+      <div class="ft-goal-item">
+        <div class="ft-goal-row">
+          <span class="ft-goal-cat">{{ m.goal.category.name }}</span>
+          <span class="ft-goal-vals">R$ {{ m.gasto }} / R$ {{ m.goal.limit_amount }}</span>
+        </div>
+        <div class="ft-progress">
+          <div class="ft-progress-bar {% if m.porcentagem <= 60 %}ok{% elif m.porcentagem <= 85 %}warning{% else %}danger{% endif %}">
+            style="width: {{ m.porcentagem }}%</div>
+
+        </div>
+        <p class="ft-goal-pct {% if m.porcentagem <= 60 %}ok{% elif m.porcentagem <= 85 %}warning{% else %}danger{% endif %}">
+          {{ m.porcentagem }}%{% if m.estourada %} - Meta estourada! {% endif %}
+        </p>
+      </div>
+    {% empty %}
+      <div class="ft-empty-state">
+        <i class="bi bi-bullseye"></i>
+        Nenhuma meta definida
+      </div>
+    {% endfor %}
+    </div>
+
+  </div>
+
+</div>
+
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<script>
+  const accent  = '#00e5a0';
+  const danger  = '#f55555';
+  const accent2 = '#3d8bff';
+  const surface = '#1e2130';
+  const muted   = '#52596b';
+  const text    = '#e8eaf0';
+
+  Chart.defaults.color = '#8d94a6';
+  Chart.defaults.borderColor = '#242832';
+  Chart.defaults.font.family = "'IBM Plex Sans', sans-serif";
+
+  // ── Bar chart ──
+  new Chart(document.getElementById('chartBar'), {
+    type: 'bar',
+    data: {
+      labels: ['{{ mes_atual }}'],
+      datasets: [
+        {
+          label: 'Receitas',
+          data: [{{ receitas }}],
+          backgroundColor: 'rgba(0,229,160,.7)',
+          borderRadius: 8,
+        },
+        {
+          label: 'Despesas',
+          data: [{{ despesas }}],
+          backgroundColor: 'rgba(255,85,85,.7)',
+          borderRadius: 8,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: text } } },
+      scales: {
+        x: { ticks: { color: muted }, grid: { color: '#242832' } },
+        y: { ticks: { color: muted }, grid: { color: '#242832' } }
+      }
+    }
+  });
+
+  // ── Pie chart ──
+  const pieLabels = [{% for m in metas %}'{{ m.goal.category.name }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+  const pieData   = [{% for m in metas %}{{ m.gasto }}{% if not forloop.last %},{% endif %}{% endfor %}];
+  const pieColors = ['#00e5a0','#3d8bff','#f5c518','#f55','#a78bfa','#fb923c','#34d399','#60a5fa'];
+
+  if (pieData.length > 0 && pieData.some(v => v > 0)) {
+    new Chart(document.getElementById('chartPie'), {
+      type: 'doughnut',
+      data: {
+        labels: pieLabels,
+        datasets: [{
+          data: pieData,
+          backgroundColor: pieColors.slice(0, pieData.length),
+          borderWidth: 2,
+          borderColor: '#161920',
+        }]
+      },
+      options: {
+        responsive: true,
+        cutout: '65%',
+        plugins: {
+          legend: {
+            position: 'bottom',
+            labels: { color: text, padding: 16, boxWidth: 12, borderRadius: 4 }
+          }
+        }
+      }
+    });
+  } else {
+    document.getElementById('chartPie').parentElement.innerHTML += '<p style="color:var(--ft-muted);font-size:.84rem;text-align:center;margin-top:1rem;">Nenhuma despesa registrada este mês.</p>';
+    document.getElementById('chartPie').style.display = 'none';
+  }
+</script>
+
+{% endblock %}

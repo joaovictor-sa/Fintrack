@@ -1,0 +1,221 @@
+<aside class="ft-sidebar" id="ftSidebar">
+
+  <!-- Collapse Toggle (desktop) -->
+  <button class="ft-collapse-btn d-none d-lg-flex" id="ftCollapseBtn" title="Recolher menu">
+    <i class="bi bi-layout-sidebar-reverse" id="ftCollapseIcon"></i>
+  </button>
+
+  <!-- Navigation -->
+  <nav class="ft-sidebar-nav">
+
+    <!-- Geral -->
+    <p class="ft-nav-section">Geral</p>
+    <ul class="ft-nav-list">
+      <li class="ft-nav-item">
+        <a href="{% url 'dashboard' %}" class="ft-nav-link {% if request.resolver_match.url_name == 'dashboard' %}active{% endif %}" title="Dashboard">
+          <i class="bi bi-speedometer2"></i>
+          <span class="ft-nav-text">Dashboard</span>
+        </a>
+      </li>
+    </ul>
+
+    <!-- Cadastros -->
+    <p class="ft-nav-section">Cadastros</p>
+    <ul class="ft-nav-list">
+
+      <li class="ft-nav-item">
+        <a href="{% url 'category-list' %}" class="ft-nav-link {% if 'category' in request.resolver_match.url_name %}active{% endif %}" title="Categorias">
+          <i class="bi bi-grid-1x2"></i>
+          <span class="ft-nav-text">Categorias</span>
+        </a>
+      </li>
+
+      <li class="ft-nav-item">
+        <a href="{% url 'goal-list' %}" class="ft-nav-link {% if 'goal' in request.resolver_match.url_name %}active{% endif %}" title="Metas">
+          <i class="bi bi-bullseye"></i>
+          <span class="ft-nav-text">Metas</span>
+        </a>
+      </li>
+
+      <li class="ft-nav-item">
+        <a href="{% url 'transaction-list' %}" class="ft-nav-link {% if 'transaction' in request.resolver_match.url_name %}active{% endif %}" title="Transações">
+          <i class="bi bi-arrow-left-right"></i>
+          <span class="ft-nav-text">Transações</span>
+        </a>
+      </li>
+
+    </ul>
+
+  </nav>
+
+  <div class="ft-sidebar-footer">
+    <span class="ft-sidebar-version">v0.1.0</span>
+  </div>
+
+  <button class="ft-sidebar-close d-lg-none" id="ftSidebarClose">
+    <i class="bi bi-x-lg"></i>
+  </button>
+
+</aside>
+
+<div class="ft-sidebar-overlay" id="ftSidebarOverlay"></div>
+
+<style>
+  .ft-sidebar {
+    width: 240px;
+    background: var(--ft-surface);
+    border-right: 1px solid var(--ft-border);
+    display: flex;
+    flex-direction: column;
+    position: fixed;
+    top: 60px; left: 0; bottom: 0;
+    z-index: 1020;
+    overflow: hidden;
+    transition: width .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  .ft-sidebar.collapsed { width: 64px; }
+
+  .ft-sidebar.collapsed .ft-nav-text { display: none; }
+  .ft-sidebar.collapsed .ft-nav-section,
+  .ft-sidebar.collapsed .ft-sidebar-version {
+    opacity: 0; pointer-events: none;
+  }
+
+  .ft-sidebar.collapsed .ft-nav-link {
+    justify-content: center;
+    padding: .65rem 0 !important;
+    width: 100%; gap: 0; display: flex;
+  }
+  .ft-sidebar.collapsed .ft-nav-link i {
+    margin: 0; width: 100%; display: flex; justify-content: center;
+  }
+  .ft-sidebar.collapsed .ft-collapse-btn {
+    justify-content: center; padding: .85rem 0;
+  }
+
+  /* Tooltip */
+  .ft-sidebar.collapsed .ft-nav-link::after {
+    content: attr(title);
+    position: absolute;
+    left: calc(100% + 10px); top: 50%; transform: translateY(-50%);
+    background: #1e2130; border: 1px solid var(--ft-border);
+    color: var(--ft-text); font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .78rem; padding: .3rem .75rem; border-radius: 8px;
+    white-space: nowrap; pointer-events: none;
+    opacity: 0; transition: opacity .15s; z-index: 200;
+  }
+  .ft-sidebar.collapsed .ft-nav-link:hover::after { opacity: 1; }
+
+  .ft-collapse-btn {
+    display: flex; align-items: center; justify-content: flex-end;
+    background: transparent; border: none; border-bottom: 1px solid var(--ft-border);
+    color: var(--ft-muted); padding: .85rem 1rem; width: 100%;
+    cursor: pointer; transition: color .2s, background .2s;
+    font-size: 1rem; flex-shrink: 0;
+  }
+  .ft-collapse-btn:hover { color: var(--ft-text); background: rgba(255,255,255,.03); }
+
+  .ft-sidebar-nav { flex: 1; padding: .5rem 0; overflow-y: auto; overflow-x: hidden; }
+
+  .ft-nav-section {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .65rem; font-weight: 700;
+    letter-spacing: 1.5px; text-transform: uppercase;
+    color: var(--ft-muted); padding: .75rem 1.25rem .3rem;
+    margin: 0; white-space: nowrap; transition: opacity .2s;
+  }
+
+  .ft-nav-list { list-style: none; padding: 0; margin: 0; }
+  .ft-nav-item { margin: 1px 0; }
+
+  .ft-nav-link {
+    display: flex; align-items: center; gap: .75rem;
+    padding: .65rem 1.25rem !important;
+    color: var(--ft-text-sub);
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .86rem; font-weight: 400;
+    text-decoration: none;
+    transition: all .18s;
+    white-space: nowrap; position: relative;
+  }
+  .ft-nav-link::before {
+    content: ''; position: absolute; left: 0; top: 10%;
+    width: 3px; height: 80%; background: transparent;
+    border-radius: 0 4px 4px 0; transition: background .2s;
+  }
+  .ft-nav-link.active::before { background: var(--ft-accent); }
+  .ft-nav-link i { font-size: 1rem; width: 20px; text-align: center; flex-shrink: 0; }
+  .ft-nav-text { transition: opacity .2s; }
+
+  .ft-nav-link:hover { color: var(--ft-text); background: rgba(255,255,255,.04); }
+  .ft-nav-link:hover i { color: var(--ft-accent); }
+  .ft-nav-link.active { color: var(--ft-accent); background: rgba(0,229,160,.07); font-weight: 500; }
+  .ft-nav-link.active i { color: var(--ft-accent); }
+
+  .ft-sidebar-footer { padding: .85rem 1.25rem; border-top: 1px solid var(--ft-border); overflow: hidden; }
+  .ft-sidebar-version { font-family: 'IBM Plex Sans', sans-serif; font-size: .7rem; color: var(--ft-muted); white-space: nowrap; transition: opacity .2s; }
+
+  .ft-sidebar-close {
+    position: absolute; top: .75rem; right: .75rem;
+    background: transparent; border: none; color: var(--ft-muted);
+    font-size: .9rem; cursor: pointer; padding: .25rem .4rem;
+    border-radius: 6px; transition: color .2s;
+  }
+  .ft-sidebar-close:hover { color: var(--ft-text); }
+
+  @media (max-width: 991.98px) {
+    .ft-sidebar {
+      transform: translateX(-100%); top: 0; width: 240px !important;
+      transition: transform .25s cubic-bezier(.4,0,.2,1);
+    }
+    .ft-sidebar.open { transform: translateX(0); box-shadow: 4px 0 30px rgba(0,0,0,.5); }
+  }
+
+  .ft-sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,.55); z-index: 1019; backdrop-filter: blur(2px); }
+  .ft-sidebar-overlay.show { display: block; }
+</style>
+
+<script>
+  (function () {
+    const sidebar      = document.getElementById('ftSidebar');
+    const overlay      = document.getElementById('ftSidebarOverlay');
+    const toggle       = document.getElementById('ftSidebarToggle');
+    const closeBtn     = document.getElementById('ftSidebarClose');
+    const collapseBtn  = document.getElementById('ftCollapseBtn');
+    const collapseIcon = document.getElementById('ftCollapseIcon');
+    const mainEl       = document.getElementById('ftMain');
+    const STORAGE_KEY  = 'ft_sidebar_collapsed';
+
+    function setCollapsed(yes) {
+      if (yes) {
+        sidebar.classList.add('collapsed');
+        if (mainEl) mainEl.style.marginLeft = '64px';
+        if (collapseIcon) {
+          collapseIcon.classList.remove('bi-layout-sidebar-reverse');
+          collapseIcon.classList.add('bi-layout-sidebar');
+        }
+        localStorage.setItem(STORAGE_KEY, '1');
+      } else {
+        sidebar.classList.remove('collapsed');
+        if (mainEl) mainEl.style.marginLeft = '240px';
+        if (collapseIcon) {
+          collapseIcon.classList.remove('bi-layout-sidebar');
+          collapseIcon.classList.add('bi-layout-sidebar-reverse');
+        }
+        localStorage.setItem(STORAGE_KEY, '0');
+      }
+    }
+
+    if (localStorage.getItem(STORAGE_KEY) === '1') setCollapsed(true);
+
+    if (collapseBtn) collapseBtn.addEventListener('click', () => setCollapsed(!sidebar.classList.contains('collapsed')));
+
+    function openSidebar()  { sidebar.classList.add('open'); overlay.classList.add('show'); document.body.style.overflow = 'hidden'; }
+    function closeSidebar() { sidebar.classList.remove('open'); overlay.classList.remove('show'); document.body.style.overflow = ''; }
+
+    if (toggle)   toggle.addEventListener('click', openSidebar);
+    if (closeBtn) closeBtn.addEventListener('click', closeSidebar);
+    if (overlay)  overlay.addEventListener('click', closeSidebar);
+  })();
+</script>

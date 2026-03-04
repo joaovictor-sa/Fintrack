@@ -1,0 +1,179 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — {{ object.title }}{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem; border-bottom: 1px solid var(--ft-border); margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+    font-size: 1.9rem; letter-spacing: -0.5px; color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  .ft-breadcrumb {
+    display: flex; align-items: center; gap: .5rem; font-size: .78rem;
+    color: var(--ft-muted); margin-bottom: .6rem; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a { color: var(--ft-text-sub); text-decoration: none; transition: color .2s; }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  .ft-card { background: var(--ft-surface); border: 1px solid var(--ft-border); border-radius: 16px; overflow: hidden; max-width: 640px; }
+  .ft-card-bar { height: 4px; }
+  .ft-card-bar.income { background: linear-gradient(90deg, var(--ft-accent), #00b37a); }
+  .ft-card-bar.expense { background: linear-gradient(90deg, #f55, #c02e2e); }
+  .ft-card-body { padding: 2rem; }
+
+  .ft-tx-header { display: flex; align-items: center; gap: 1rem; margin-bottom: 2rem; }
+  .ft-tx-icon {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 52px; height: 52px; border-radius: 14px; font-size: 1.4rem; flex-shrink: 0;
+  }
+  .ft-tx-icon.income { background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.25); color: var(--ft-accent); }
+  .ft-tx-icon.expense { background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.25); color: #f55; }
+
+  .ft-tx-title {
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800;
+    font-size: 1.3rem; color: var(--ft-text); margin: 0 0 .3rem; letter-spacing: -.3px;
+  }
+  .ft-tx-type {
+    display: inline-flex; align-items: center; gap: .35rem;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-size: .75rem;
+    font-weight: 700; padding: .2rem .65rem; border-radius: 20px;
+  }
+  .ft-tx-type.income { background: rgba(0,229,160,.1); border: 1px solid rgba(0,229,160,.25); color: var(--ft-accent); }
+  .ft-tx-type.expense { background: rgba(255,68,68,.1); border: 1px solid rgba(255,68,68,.25); color: #f55; }
+
+  .ft-amount-box {
+    border-radius: 12px; padding: 1.25rem 1.5rem; margin-bottom: 1.75rem;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;
+  }
+  .ft-amount-box.income { background: rgba(0,229,160,.06); border: 1px solid rgba(0,229,160,.2); }
+  .ft-amount-box.expense { background: rgba(255,68,68,.06); border: 1px solid rgba(255,68,68,.2); }
+  .ft-amount-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ft-muted); margin-bottom: .3rem; }
+  .ft-amount-value { font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 800; font-size: 1.8rem; letter-spacing: -.5px; }
+  .ft-amount-value.income { color: var(--ft-accent); }
+  .ft-amount-value.expense { color: #f55; }
+
+  .ft-divider { border: none; border-top: 1px solid var(--ft-border); margin: 1.5rem 0; }
+
+  .ft-field { display: flex; flex-direction: column; gap: .4rem; margin-bottom: 1.4rem; }
+  .ft-field:last-of-type { margin-bottom: 0; }
+  .ft-field-label { font-family: 'Plus Jakarta Sans', sans-serif; font-size: .7rem; font-weight: 700; letter-spacing: 1px; text-transform: uppercase; color: var(--ft-muted); }
+  .ft-field-value { font-family: 'IBM Plex Sans', sans-serif; font-size: .92rem; color: var(--ft-text); background: var(--ft-bg); border: 1px solid var(--ft-border); border-radius: 10px; padding: .7rem 1rem; line-height: 1.5; }
+  .ft-field-value.empty { color: var(--ft-muted); font-style: italic; }
+
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-edit {
+    background: rgba(245,197,24,.1); border: 1px solid rgba(245,197,24,.3); color: #f5c518;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; transition: all .2s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-edit:hover { background: rgba(245,197,24,.2); border-color: #f5c518; color: #f5c518; transform: translateY(-1px); }
+
+  .btn-ft-danger {
+    background: rgba(255,68,68,.08); border: 1px solid rgba(255,68,68,.25); color: #f55;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; transition: all .2s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-danger:hover { background: rgba(255,68,68,.15); border-color: #f55; color: #f55; transform: translateY(-1px); }
+
+  .btn-ft-ghost {
+    background: transparent; border: 1px solid var(--ft-border); color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; transition: all .2s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-ghost:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+</style>
+
+<div class="container-fluid px-4">
+
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'transaction-list' %}">Transações</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>{{ object.title }}</span>
+    </div>
+    <h1><i class="bi bi-receipt me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Detalhe da <span>Transação</span></h1>
+    <p>Informações completas da transação selecionada</p>
+  </div>
+
+  <div class="ft-card">
+    <div class="ft-card-bar {% if object.type == 'income' %}income{% else %}expense{% endif %}"></div>
+    <div class="ft-card-body">
+
+      <div class="ft-tx-header">
+        <span class="ft-tx-icon {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+          <i class="bi {% if object.type == 'income' %}bi-arrow-up-circle{% else %}bi-arrow-down-circle{% endif %}"></i>
+        </span>
+        <div>
+          <p class="ft-tx-title">{{ object.title }}</p>
+          <span class="ft-tx-type {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+            {% if object.type == 'income' %}
+              <i class="bi bi-arrow-up"></i> Receita
+            {% else %}
+              <i class="bi bi-arrow-down"></i> Despesa
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <div class="ft-amount-box {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+        <div>
+          <p class="ft-amount-label">Valor</p>
+          <p class="ft-amount-value {% if object.type == 'income' %}income{% else %}expense{% endif %}">
+            {% if object.type == 'income' %}+{% else %}-{% endif %} R$ {{ object.amount }}
+          </p>
+        </div>
+        <i class="bi {% if object.type == 'income' %}bi-graph-up-arrow{% else %}bi-graph-down-arrow{% endif %}" style="font-size:2rem;opacity:.25;"></i>
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-field">
+        <span class="ft-field-label">Categoria</span>
+        <div class="ft-field-value">{{ object.category.name }}</div>
+      </div>
+
+      <div class="ft-field">
+        <span class="ft-field-label">Data</span>
+        <div class="ft-field-value">{{ object.date|date:"d/m/Y" }}</div>
+      </div>
+
+      <div class="ft-field">
+        <span class="ft-field-label">Descrição</span>
+        <div class="ft-field-value {% if not object.description %}empty{% endif %}">
+          {{ object.description|default:"Sem descrição cadastrada." }}
+        </div>
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-actions">
+        <a href="{% url 'transaction-update' object.id %}" class="btn-ft-edit">
+          <i class="bi bi-pencil"></i> Editar
+        </a>
+        <a href="{% url 'transaction-delete' object.id %}" class="btn-ft-danger">
+          <i class="bi bi-trash3"></i> Excluir
+        </a>
+        <a href="{% url 'transaction-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-arrow-left"></i> Voltar
+        </a>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+{% endblock %}

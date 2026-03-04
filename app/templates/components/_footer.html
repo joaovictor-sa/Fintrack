@@ -1,0 +1,72 @@
+<footer class="ft-footer">
+  <div class="ft-footer-inner d-flex align-items-center justify-content-between flex-wrap gap-2">
+    <div class="ft-footer-brand d-flex align-items-center gap-2">
+      <span class="ft-footer-logo">
+        <i class="bi bi-graph-up-arrow"></i>
+      </span>
+      <span class="ft-footer-name">FinTrack</span>
+    </div>
+
+    <p class="ft-footer-copy mb-0">
+      &copy; FinTrack 2026 &mdash; Todos os direitos reservados.
+    </p>
+
+    <div class="ft-footer-links d-flex align-items-center gap-3">
+      <span class="ft-footer-status">
+        <i class="bi bi-circle-fill ft-status-dot"></i> Sistema online
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ft-footer {
+    background: var(--ft-surface, #161920);
+    border-top: 1px solid var(--ft-border, #242832);
+    padding: 1rem 1.5rem;
+    margin-top: auto;
+    width: 100%;
+  }
+  .ft-footer-inner {
+    max-width: 100%;
+  }
+  .ft-footer-logo {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px; height: 28px;
+    background: rgba(0,229,160,.12);
+    border-radius: 7px;
+    color: var(--ft-accent, #00e5a0);
+    font-size: .85rem;
+  }
+  .ft-footer-name {
+    font-family: 'Syne', sans-serif;
+    font-weight: 800;
+    font-size: .9rem;
+    color: var(--ft-text, #e8eaf0);
+    letter-spacing: -.3px;
+  }
+  .ft-footer-copy {
+    font-size: .78rem;
+    color: var(--ft-muted, #52596b);
+    font-family: 'DM Sans', sans-serif;
+  }
+  .ft-footer-status {
+    font-size: .75rem;
+    color: var(--ft-muted, #52596b);
+    font-family: 'DM Sans', sans-serif;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
+  }
+  .ft-status-dot {
+    font-size: .45rem;
+    color: var(--ft-accent, #00e5a0);
+    animation: ft-pulse 2.5s ease-in-out infinite;
+  }
+  @keyframes ft-pulse {
+    0%, 100% { opacity: 1; }
+    50%       { opacity: .3; }
+  }
+</style>

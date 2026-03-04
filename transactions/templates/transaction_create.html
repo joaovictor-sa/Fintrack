@@ -1,0 +1,249 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}FinTrack — Nova Transação{% endblock %}
+
+{% block content %}
+
+<style>
+  .ft-page-header {
+    padding: 2.5rem 0 1.8rem;
+    border-bottom: 1px solid var(--ft-border);
+    margin-bottom: 2rem;
+  }
+  .ft-page-header h1 {
+    font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 800; font-size: 1.9rem; letter-spacing: -0.5px; color: var(--ft-text);
+  }
+  .ft-page-header h1 span { color: var(--ft-accent); }
+  .ft-page-header p { color: var(--ft-text-sub); font-size: .9rem; margin: 0; }
+
+  .ft-breadcrumb {
+    display: flex; align-items: center; gap: .5rem;
+    font-size: .78rem; color: var(--ft-muted);
+    margin-bottom: .6rem; font-family: 'IBM Plex Sans', sans-serif;
+  }
+  .ft-breadcrumb a { color: var(--ft-text-sub); text-decoration: none; transition: color .2s; }
+  .ft-breadcrumb a:hover { color: var(--ft-accent); }
+  .ft-breadcrumb i { font-size: .65rem; }
+
+  .ft-card {
+    background: var(--ft-surface); border: 1px solid var(--ft-border);
+    border-radius: 16px; padding: 2rem; max-width: 640px;
+  }
+
+  .ft-form-group { margin-bottom: 1.4rem; }
+  .ft-form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.4rem; }
+
+  .ft-label {
+    display: block; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-size: .78rem; font-weight: 700; letter-spacing: .6px;
+    text-transform: uppercase; color: var(--ft-text-sub); margin-bottom: .5rem;
+  }
+  .ft-label span { color: #f44; margin-left: 2px; }
+
+  .ft-input, .ft-select, .ft-textarea {
+    width: 100%; background: var(--ft-bg); border: 1px solid var(--ft-border);
+    border-radius: 10px; color: var(--ft-text); font-family: 'IBM Plex Sans', sans-serif;
+    font-size: .88rem; padding: .7rem 1rem;
+    transition: border-color .2s, box-shadow .2s; outline: none; appearance: none;
+  }
+  .ft-input::placeholder, .ft-textarea::placeholder { color: var(--ft-muted); }
+  .ft-input:focus, .ft-select:focus, .ft-textarea:focus {
+    border-color: var(--ft-accent); box-shadow: 0 0 0 3px rgba(0,229,160,.1);
+  }
+  .ft-select { cursor: pointer; }
+  .ft-textarea { resize: vertical; min-height: 90px; }
+  .ft-input.is-invalid, .ft-select.is-invalid { border-color: #f44; box-shadow: 0 0 0 3px rgba(255,68,68,.1); }
+  input[type=date]::-webkit-calendar-picker-indicator{
+    filter:invert(1);
+  }
+  .ft-error { font-size: .78rem; color: #f77; margin-top: .35rem; font-family: 'IBM Plex Sans', sans-serif; }
+
+  /* form error global (meta estourada) */
+  .ft-form-error {
+    background: rgba(255,68,68,.08); border: 1px solid rgba(255,68,68,.25);
+    border-radius: 10px; padding: .85rem 1rem; margin-bottom: 1.5rem;
+    font-family: 'IBM Plex Sans', sans-serif; font-size: .84rem; color: #f77;
+    display: flex; align-items: flex-start; gap: .6rem;
+  }
+
+  .ft-input-group { display: flex; }
+  .ft-input-prefix {
+    background: #1e2130; border: 1px solid var(--ft-border); border-right: none;
+    border-radius: 10px 0 0 10px; color: var(--ft-muted);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .85rem;
+    padding: .7rem 1rem; display: flex; align-items: center;
+  }
+  .ft-input-group .ft-input { border-radius: 0 10px 10px 0; }
+
+  /* type toggle */
+  .ft-type-group { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+  .ft-type-option { display: none; }
+  .ft-type-label {
+    display: flex; align-items: center; justify-content: center; gap: .5rem;
+    padding: .75rem 1rem; border-radius: 10px; border: 1.5px solid var(--ft-border);
+    cursor: pointer; font-family: 'Plus Jakarta Sans', sans-serif;
+    font-weight: 600; font-size: .85rem; color: var(--ft-text-sub);
+    transition: all .2s; user-select: none;
+  }
+  .ft-type-option[value="income"]:checked + .ft-type-label {
+    background: rgba(0,229,160,.1); border-color: var(--ft-accent); color: var(--ft-accent);
+  }
+  .ft-type-option[value="expense"]:checked + .ft-type-label {
+    background: rgba(255,68,68,.1); border-color: #f55; color: #f55;
+  }
+  .ft-type-label:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+
+  .ft-divider { border: none; border-top: 1px solid var(--ft-border); margin: 1.75rem 0; }
+  .ft-actions { display: flex; align-items: center; gap: .75rem; flex-wrap: wrap; }
+
+  .btn-ft-primary {
+    background: var(--ft-accent); border: none; color: #0d0f14;
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 700; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; cursor: pointer;
+    transition: opacity .2s, transform .15s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-primary:hover { opacity: .85; transform: translateY(-1px); color: #0d0f14; }
+
+  .btn-ft-ghost {
+    background: transparent; border: 1px solid var(--ft-border); color: var(--ft-text-sub);
+    font-family: 'Plus Jakarta Sans', sans-serif; font-weight: 600; font-size: .85rem;
+    border-radius: 10px; padding: .65rem 1.5rem; transition: all .2s;
+    display: inline-flex; align-items: center; gap: .45rem; text-decoration: none;
+  }
+  .btn-ft-ghost:hover { border-color: var(--ft-text-sub); color: var(--ft-text); }
+</style>
+
+<div class="container-fluid px-4">
+
+  <div class="ft-page-header">
+    <div class="ft-breadcrumb">
+      <a href="{% url 'transaction-list' %}">Transações</a>
+      <i class="bi bi-chevron-right"></i>
+      <span>Nova Transação</span>
+    </div>
+    <h1><i class="bi bi-plus-circle me-2" style="color:var(--ft-accent);font-size:1.5rem;"></i>Nova <span>Transação</span></h1>
+    <p>Registre uma nova receita ou despesa</p>
+  </div>
+
+  <div class="ft-card">
+    <form method="post" novalidate>
+      {% csrf_token %}
+
+      {% if form.non_field_errors %}
+        {% for error in form.non_field_errors %}
+          <div class="ft-form-error">
+            <i class="bi bi-exclamation-triangle-fill mt-1"></i>
+            <span>{{ error }}</span>
+          </div>
+        {% endfor %}
+      {% endif %}
+
+      <!-- Tipo -->
+      <div class="ft-form-group">
+        <label class="ft-label">Tipo <span>*</span></label>
+        <div class="ft-type-group">
+          <div>
+            <input type="radio" name="type" id="type_income" value="income" class="ft-type-option"
+              {% if form.type.value == 'income' %}checked{% endif %}>
+            <label for="type_income" class="ft-type-label">
+              <i class="bi bi-arrow-up-circle"></i> Receita
+            </label>
+          </div>
+          <div>
+            <input type="radio" name="type" id="type_expense" value="expense" class="ft-type-option"
+              {% if form.type.value == 'expense' or not form.type.value %}checked{% endif %}>
+            <label for="type_expense" class="ft-type-label">
+              <i class="bi bi-arrow-down-circle"></i> Despesa
+            </label>
+          </div>
+        </div>
+        {% for error in form.type.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Título -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_title">Título <span>*</span></label>
+        <input type="text" id="id_title" name="title"
+          class="ft-input {% if form.title.errors %}is-invalid{% endif %}"
+          placeholder="Ex: Uber, Mercado, Salário..."
+          value="{{ form.title.value|default:'' }}" autofocus>
+        {% for error in form.title.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Valor e Data -->
+      <div class="ft-form-row">
+        <div>
+          <label class="ft-label" for="id_amount">Valor <span>*</span></label>
+          <div class="ft-input-group">
+            <span class="ft-input-prefix">R$</span>
+            <input type="number" id="id_amount" name="amount"
+              class="ft-input {% if form.amount.errors %}is-invalid{% endif %}"
+              placeholder="0,00" step="0.01" min="0"
+              value="{{ form.amount.value|default:'' }}">
+          </div>
+          {% for error in form.amount.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        </div>
+        <div>
+          <label class="ft-label" for="id_date">Data <span>*</span></label>
+          <input type="date" id="id_date" name="date"
+            class="ft-input {% if form.date.errors %}is-invalid{% endif %}"
+            value="{{ form.date.value|default:'' }}">
+          {% for error in form.date.errors %}
+            <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+          {% endfor %}
+        </div>
+      </div>
+
+      <!-- Categoria -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_category">Categoria <span>*</span></label>
+        <select id="id_category" name="category" class="ft-select {% if form.category.errors %}is-invalid{% endif %}">
+          <option value="">Selecione uma categoria...</option>
+          {% for cat in form.category.field.queryset %}
+            <option value="{{ cat.id }}" {% if form.category.value|stringformat:"s" == cat.id|stringformat:"s" %}selected{% endif %}>
+              {{ cat.name }}
+            </option>
+          {% endfor %}
+        </select>
+        {% for error in form.category.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <!-- Descrição -->
+      <div class="ft-form-group">
+        <label class="ft-label" for="id_description">Descrição</label>
+        <textarea id="id_description" name="description"
+          class="ft-textarea {% if form.description.errors %}is-invalid{% endif %}"
+          placeholder="Detalhes opcionais sobre esta transação...">{{ form.description.value|default:'' }}</textarea>
+        {% for error in form.description.errors %}
+          <p class="ft-error"><i class="bi bi-exclamation-circle me-1"></i>{{ error }}</p>
+        {% endfor %}
+      </div>
+
+      <hr class="ft-divider">
+
+      <div class="ft-actions">
+        <button type="submit" class="btn-ft-primary">
+          <i class="bi bi-check-lg"></i> Salvar Transação
+        </button>
+        <a href="{% url 'transaction-list' %}" class="btn-ft-ghost">
+          <i class="bi bi-x-lg"></i> Cancelar
+        </a>
+      </div>
+
+    </form>
+  </div>
+
+</div>
+
+{% endblock %}

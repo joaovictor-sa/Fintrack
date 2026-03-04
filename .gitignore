@@ -27,3 +27,4 @@ postgres_data/
 .vscode/
 .idea/
 *.swp
+venv/

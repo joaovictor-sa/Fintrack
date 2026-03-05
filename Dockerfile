@@ -19,6 +19,10 @@ RUN pip install --upgrade pip && pip install -r requirements.txt
 # Copia o projeto
 COPY . .
 
+# Coleta arquivos estáticos
+RUN python manage.py collectstatic --no-input
+
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+# Gunicorn em vez de runserver para produção
+CMD ["gunicorn", "app.wsgi:application", "--bind", "0.0.0.0:8000"]

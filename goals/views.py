@@ -22,7 +22,8 @@ class GoalListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
             queryset = queryset.filter(category__name__icontains=category)
 
         return queryset
-    
+
+
 class GoalCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
     model = models.Goal
     form_class = GoalForm
@@ -55,9 +56,10 @@ class GoalDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
 class GoalListCreateAPIView(generics.ListCreateAPIView):
     queryset = models.Goal.objects.all()
     serializer_class = serializers.GoalSerializer
+    permission_classes = [IsAuthenticated]
 
 
 class GoalRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Goal.objects.all()
     serializer_class = serializers.GoalSerializer
-
+    permission_classes = [IsAuthenticated]

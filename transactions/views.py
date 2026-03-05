@@ -36,11 +36,12 @@ class TransactionUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateV
     success_url = reverse_lazy('transaction-list')
     permission_required = 'transactions.change_transaction'
 
+
 class TransactionDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
     model = models.Transaction
     template_name = 'transaction_delete.html'
     success_url = reverse_lazy('transaction-list')
-    permission_required = 'transactions.delete_transaction'    
+    permission_required = 'transactions.delete_transaction'
 
 
 class TransactionListCreateAPIView(generics.ListCreateAPIView):
@@ -53,4 +54,3 @@ class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIV
     queryset = models.Transaction.objects.all()
     serializer_class = serializers.TransactionSerializer
     permission_classes = [IsAuthenticated]
-

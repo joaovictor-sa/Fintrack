@@ -1,6 +1,5 @@
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from django.urls import path, include
 from django.views.generic import RedirectView
 
@@ -19,5 +18,4 @@ urlpatterns = [
     path('', include('transactions.urls')),
 
     path('api/v1/', include('authentication.urls')),
-    
 ]

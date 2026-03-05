@@ -56,8 +56,10 @@ class CategoryDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView
 class CategoryListCreateAPIView(generics.ListCreateAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    permission_classes = [IsAuthenticated]
 
 
 class CategoryRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    permission_classes = [IsAuthenticated]

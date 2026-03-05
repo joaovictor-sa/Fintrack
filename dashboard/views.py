@@ -1,9 +1,8 @@
 from django.views.generic import TemplateView
-from django.db.models import Sum, Q
+from django.db.models import Sum
 from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
 from transactions.models import Transaction
 from goals.models import Goal
-from categories.models import Category
 import datetime
 
 

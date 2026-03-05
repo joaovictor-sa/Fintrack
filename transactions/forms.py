@@ -13,8 +13,8 @@ class TransactionForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
             'amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
         }
-        # Widgets definem como o campo é renderizado no HTML. 
-        # Sem isso o Django escolhe um padrão. Aqui date vira um date picker nativo do browser, 
+        # Widgets definem como o campo é renderizado no HTML.
+        # Sem isso o Django escolhe um padrão. Aqui date vira um date picker nativo do browser,
         # description vira um textarea pequeno de 3 linhas, e amount aceita decimais com step=0.01
         # e bloqueia negativos com min=0.
 

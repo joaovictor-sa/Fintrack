@@ -1,13 +1,13 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from django.urls import reverse_lazy
-from django.contrib.auth.mixins import LoginRequiredMixin, PermissionRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin
 from . import models, serializers
 from .forms import GoalForm
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
 
 
-class GoalListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
+class GoalListView(LoginRequiredMixin, ListView):
     model = models.Goal
     template_name = 'goal_list.html'
     context_object_name = 'goals'
@@ -24,33 +24,29 @@ class GoalListView(LoginRequiredMixin, PermissionRequiredMixin, ListView):
         return queryset
 
 
-class GoalCreateView(LoginRequiredMixin, PermissionRequiredMixin, CreateView):
+class GoalCreateView(LoginRequiredMixin, CreateView):
     model = models.Goal
     form_class = GoalForm
     template_name = 'goal_create.html'
     success_url = reverse_lazy('goal-list')
-    permission_required = 'goals.add_goal'
 
 
-class GoalDetailView(LoginRequiredMixin, PermissionRequiredMixin, DetailView):
+class GoalDetailView(LoginRequiredMixin, DetailView):
     model = models.Goal
     template_name = 'goal_detail.html'
-    permission_required = 'goals.view_goal'
 
 
-class GoalUpdateView(LoginRequiredMixin, PermissionRequiredMixin, UpdateView):
+class GoalUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Goal
     template_name = 'goal_update.html'
     form_class = GoalForm
     success_url = reverse_lazy('goal-list')
-    permission_required = 'goals.change_goal'
 
 
-class GoalDeleteView(LoginRequiredMixin, PermissionRequiredMixin, DeleteView):
+class GoalDeleteView(LoginRequiredMixin, DeleteView):
     model = models.Goal
     template_name = 'goal_delete.html'
     success_url = reverse_lazy('goal-list')
-    permission_required = 'goals.delete_goal'
 
 
 class GoalListCreateAPIView(generics.ListCreateAPIView):

@@ -20,4 +20,4 @@ RUN python manage.py collectstatic --no-input
 EXPOSE 8000
 
 # Roda migrate + create_demo_user antes de subir o servidor
-CMD sh -c "python manage.py migrate && python manage.py create_demo_user && gunicorn app.wsgi:application --bind 0.0.0.0:8000"
+CMD sh -c "python manage.py migrate && python manage.py seed_demo_data && gunicorn app.wsgi:application --bind 0.0.0.0:8000"

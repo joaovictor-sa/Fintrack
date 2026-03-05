@@ -36,7 +36,6 @@
       min-height: 100vh;
     }
 
-    /* ── Left panel ── */
     .ft-left {
       flex: 1;
       display: flex;
@@ -63,7 +62,6 @@
       z-index: 1;
     }
 
-    /* Logo */
     .ft-logo {
       display: flex; align-items: center; gap: 1rem;
       margin-bottom: 3.5rem;
@@ -86,7 +84,6 @@
       margin-top: .2rem;
     }
 
-    /* Heading */
     .ft-heading {
       font-family: 'Plus Jakarta Sans', sans-serif;
       font-weight: 800; font-size: 2rem;
@@ -98,7 +95,6 @@
       margin-bottom: 2.5rem; line-height: 1.5;
     }
 
-    /* Fields */
     .ft-field { margin-bottom: 1.5rem; }
 
     .ft-label {
@@ -150,7 +146,6 @@
     }
     .ft-pwd-toggle:hover { color: var(--ft-text); }
 
-    /* Error */
     .ft-error-box {
       background: rgba(255,68,68,.08);
       border: 1px solid rgba(255,68,68,.25);
@@ -161,7 +156,6 @@
       display: flex; align-items: center; gap: .6rem;
     }
 
-    /* Button */
     .btn-login {
       width: 100%;
       background: var(--ft-accent);
@@ -179,12 +173,49 @@
     .btn-login:hover { opacity: .88; transform: translateY(-1px); }
     .btn-login:active { transform: translateY(0); }
 
+    /* Divisor */
+    .ft-divider {
+      display: flex; align-items: center; gap: 1rem;
+      margin: 1.5rem 0;
+    }
+    .ft-divider::before,
+    .ft-divider::after {
+      content: ''; flex: 1;
+      height: 1px; background: var(--ft-border);
+    }
+    .ft-divider span {
+      font-size: .75rem; color: var(--ft-muted);
+      white-space: nowrap;
+    }
+
+    /* Botão demo */
+    .btn-demo {
+      width: 100%;
+      background: transparent;
+      border: 1.5px solid var(--ft-border);
+      color: var(--ft-text-sub);
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600; font-size: .95rem;
+      border-radius: 12px;
+      padding: .9rem;
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .15s;
+      display: flex; align-items: center;
+      justify-content: center; gap: .5rem;
+      text-decoration: none;
+    }
+    .btn-demo:hover {
+      border-color: var(--ft-accent);
+      color: var(--ft-accent);
+      transform: translateY(-1px);
+    }
+    .btn-demo:active { transform: translateY(0); }
+
     .ft-footer {
       margin-top: 2.5rem;
       font-size: .8rem; color: var(--ft-muted);
     }
 
-    /* ── Right panel ── */
     .ft-right {
       width: 45%;
       background: var(--ft-surface);
@@ -330,6 +361,12 @@
           <i class="bi bi-box-arrow-in-right"></i> Entrar
         </button>
       </form>
+
+      <div class="ft-divider"><span>ou</span></div>
+
+      <a href="{% url 'demo_login' %}" class="btn-demo">
+        <i class="bi bi-eye"></i> Acessar como visitante
+      </a>
 
       <p class="ft-footer">FinTrack © {% now "Y" %} — Todos os direitos reservados</p>
 

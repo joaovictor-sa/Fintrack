@@ -173,7 +173,6 @@
     .btn-login:hover { opacity: .88; transform: translateY(-1px); }
     .btn-login:active { transform: translateY(0); }
 
-    /* Divisor */
     .ft-divider {
       display: flex; align-items: center; gap: 1rem;
       margin: 1.5rem 0;
@@ -188,7 +187,6 @@
       white-space: nowrap;
     }
 
-    /* Botão demo */
     .btn-demo {
       width: 100%;
       background: transparent;
@@ -211,8 +209,21 @@
     }
     .btn-demo:active { transform: translateY(0); }
 
+    .ft-register-link {
+      text-align: center;
+      margin-top: 1.25rem;
+      font-size: .88rem;
+      color: var(--ft-text-sub);
+    }
+    .ft-register-link a {
+      color: var(--ft-accent);
+      font-weight: 600;
+      text-decoration: none;
+    }
+    .ft-register-link a:hover { opacity: .8; }
+
     .ft-footer {
-      margin-top: 2.5rem;
+      margin-top: 2rem;
       font-size: .8rem; color: var(--ft-muted);
     }
 
@@ -367,6 +378,10 @@
       <a href="{% url 'demo_login' %}" class="btn-demo">
         <i class="bi bi-eye"></i> Acessar como visitante
       </a>
+
+      <p class="ft-register-link">
+        Não tem conta? <a href="{% url 'register' %}">Criar conta →</a>
+      </p>
 
       <p class="ft-footer">FinTrack © {% now "Y" %} — Todos os direitos reservados</p>
 

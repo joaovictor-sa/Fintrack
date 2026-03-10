@@ -13,7 +13,6 @@ def demo_login(request):
     return redirect('login')
 
 
-
 class RegisterView(CreateView):
     form_class = RegisterForm
     template_name = 'registration/register.html'
@@ -23,4 +22,3 @@ class RegisterView(CreateView):
         response = super().form_valid(form)
         login(self.request, self.object)
         return response
-    

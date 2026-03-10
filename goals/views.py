@@ -12,10 +12,9 @@ class GoalListView(LoginRequiredMixin, ListView):
     template_name = 'goal_list.html'
     context_object_name = 'goals'
     paginate_by = 10
-    permission_required = 'goals.view_goal'
 
     def get_queryset(self):
-        queryset = super().get_queryset()
+        queryset = models.Goal.objects.filter(user=self.request.user)
         category = self.request.GET.get('category')
 
         if category:
@@ -30,10 +29,22 @@ class GoalCreateView(LoginRequiredMixin, CreateView):
     template_name = 'goal_create.html'
     success_url = reverse_lazy('goal-list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+
+    def form_valid(self, form):
+        form.instance.user = self.request.user
+        return super().form_valid(form)
+
 
 class GoalDetailView(LoginRequiredMixin, DetailView):
     model = models.Goal
     template_name = 'goal_detail.html'
+
+    def get_queryset(self):
+        return models.Goal.objects.filter(user=self.request.user)
 
 
 class GoalUpdateView(LoginRequiredMixin, UpdateView):
@@ -42,20 +53,38 @@ class GoalUpdateView(LoginRequiredMixin, UpdateView):
     form_class = GoalForm
     success_url = reverse_lazy('goal-list')
 
+    def get_form_kwargs(self):
+        kwargs = super().get_form_kwargs()
+        kwargs['user'] = self.request.user
+        return kwargs
+    
+    def get_queryset(self):
+        return models.Goal.objects.filter(user=self.request.user)
+
 
 class GoalDeleteView(LoginRequiredMixin, DeleteView):
     model = models.Goal
     template_name = 'goal_delete.html'
     success_url = reverse_lazy('goal-list')
 
+    def get_queryset(self):
+        return models.Goal.objects.filter(user=self.request.user)
+
 
 class GoalListCreateAPIView(generics.ListCreateAPIView):
-    queryset = models.Goal.objects.all()
     serializer_class = serializers.GoalSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return models.Goal.objects.filter(user=self.request.user)
+    
+    def perform_create(self, serializer):
+        serializer.save(user=self.requst.user)
 
 
 class GoalRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = models.Goal.objects.all()
     serializer_class = serializers.GoalSerializer
     permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        return models.Goal.objects.filter(user=self.request.user)

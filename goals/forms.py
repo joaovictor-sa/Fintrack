@@ -1,5 +1,6 @@
 from django import forms
 from .models import Goal
+from categories.models import Category
 
 
 MONTH_CHOICES = [
@@ -23,3 +24,9 @@ class GoalForm(forms.ModelForm):
             'year': forms.NumberInput(attrs={'min': '2020', 'max': '2100'}),
             'description': forms.Textarea(attrs={'rows': 3}),
         }
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        if user:
+            self.fields['category'].queryset = Category.objects.filter(user=user)

@@ -1,5 +1,6 @@
 from django import forms
 from .models import Transaction
+from categories.models import Category
 from django.db.models import Sum
 
 
@@ -29,11 +30,13 @@ class TransactionForm(forms.ModelForm):
             from goals.models import Goal
             try:
                 goal = Goal.objects.get(
+                    user=self.user,
                     category=category,
                     month=date.month,
                     year=date.year
                 )
                 spent = Transaction.objects.filter(
+                    user=self.user,
                     category=category,
                     date__month=date.month,
                     date__year=date.year,
@@ -54,3 +57,10 @@ class TransactionForm(forms.ModelForm):
                 pass
 
         return cleaned_data
+
+    def __init__(self, *args, **kwargs):
+        user = kwargs.pop('user', None)
+        super().__init__(*args, **kwargs)
+        self.user = user
+        if user:
+            self.fields['category'].queryset = Category.objects.filter(user=user)

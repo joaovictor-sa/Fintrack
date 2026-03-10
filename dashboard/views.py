@@ -14,9 +14,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
         today = datetime.date.today()
         month = today.month
         year = today.year
+        user = self.request.user
 
         transactions_mes = Transaction.objects.filter(
-            date__month=month, date__year=year
+            user=user, date__month=month, date__year=year
         )
 
         receitas = transactions_mes.filter(type='income').aggregate(
@@ -27,10 +28,10 @@ class DashboardView(LoginRequiredMixin, TemplateView):
 
         saldo = receitas - despesas
 
-        # metas do mês com gasto atual
         metas = []
-        for goal in Goal.objects.filter(month=month, year=year):
+        for goal in Goal.objects.filter(user=user, month=month, year=year):
             gasto = Transaction.objects.filter(
+                user=user,
                 category=goal.category,
                 date__month=month,
                 date__year=year,
@@ -46,8 +47,9 @@ class DashboardView(LoginRequiredMixin, TemplateView):
                 'estourada': gasto > goal.limit_amount,
             })
 
-        # últimas 5 transações
-        ultimas = Transaction.objects.order_by('-date', '-created_at')[:5]
+        ultimas = Transaction.objects.filter(
+            user=user
+        ).order_by('-date', '-created_at')[:5]
 
         context.update({
             'receitas': receitas,

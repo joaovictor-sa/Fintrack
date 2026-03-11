@@ -1,3 +1,11 @@
+# FinTrack
+
+![Python Version](https://img.shields.io/badge/python-3.12-blue?style=for-the-badge&logo=python&logoColor=white)
+![Django Version](https://img.shields.io/badge/django-5.0-green?style=for-the-badge&logo=django&logoColor=white)
+![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
+![License](https://img.shields.io/badge/license-MIT-important?style=for-the-badge)
+![Status](https://img.shields.io/badge/status-em%20desenvolvimento-orange?style=for-the-badge)
+
 # 🚀 FinTrack — Controle Financeiro Inteligente
 
 O **FinTrack** é uma aplicação web completa para gestão de finanças pessoais. O sistema permite o registro de receitas e despesas, organização por categorias, definição de metas de gastos e visualização de dashboards integrados. Desenvolvido com uma arquitetura moderna, o projeto separa a lógica de interface (Django Templates) de uma API robusta (Django REST Framework).

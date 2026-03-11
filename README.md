@@ -38,6 +38,7 @@ Graças à automação do Docker, você só precisa de **um passo** para subir a
 
 ### Pré-requisitos
 * [Docker](https://www.docker.com/) instalado.
+* [Docker Compose](https://docs.docker.com/compose/install/)
 
 ### Passo Único
 

@@ -7,6 +7,13 @@ from . import models, serializers
 from .forms import TransactionForm
 
 
+MONTHS = [
+    (1, 'Janeiro'), (2, 'Fevereiro'), (3, 'Março'), (4, 'Abril'),
+    (5, 'Maio'), (6, 'Junho'), (7, 'Julho'), (8, 'Agosto'),
+    (9, 'Setembro'), (10, 'Outubro'), (11, 'Novembro'), (12, 'Dezembro'),
+]
+
+
 class TransactionListView(LoginRequiredMixin, ListView):
     model = models.Transaction
     template_name = 'transaction_list.html'
@@ -14,8 +21,25 @@ class TransactionListView(LoginRequiredMixin, ListView):
     paginate_by = 10
 
     def get_queryset(self):
-        queryset = models.Transaction.objects.filter(user=self.request.user)
+        queryset = models.Transaction.objects.filter(user=self.request.user).order_by('-date')
+
+        title = self.request.GET.get('title', '').strip()
+        type_ = self.request.GET.get('type', '').strip()
+        month = self.request.GET.get('month', '').strip()
+
+        if title:
+            queryset = queryset.filter(title__icontains=title)
+        if type_ in ('income', 'expense'):
+            queryset = queryset.filter(type=type_)
+        if month.isdigit():
+            queryset = queryset.filter(date__month=int(month))
+
         return queryset
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['months'] = MONTHS
+        return context
 
 
 class TransactionCreateView(LoginRequiredMixin, CreateView):
@@ -52,7 +76,7 @@ class TransactionUpdateView(LoginRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-    
+
     def get_queryset(self):
         return models.Transaction.objects.filter(user=self.request.user)
 
@@ -72,9 +96,9 @@ class TransactionListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return models.Transaction.objects.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
-        serializer.save(user=self.requst.user)
+        serializer.save(user=self.request.user)  # era self.requst (typo)
 
 
 class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

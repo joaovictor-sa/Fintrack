@@ -14,10 +14,6 @@ class TransactionForm(forms.ModelForm):
             'description': forms.Textarea(attrs={'rows': 3}),
             'amount': forms.NumberInput(attrs={'step': '0.01', 'min': '0'}),
         }
-        # Widgets definem como o campo é renderizado no HTML.
-        # Sem isso o Django escolhe um padrão. Aqui date vira um date picker nativo do browser,
-        # description vira um textarea pequeno de 3 linhas, e amount aceita decimais com step=0.01
-        # e bloqueia negativos com min=0.
 
     def clean(self):
         cleaned_data = super().clean()
@@ -45,22 +41,33 @@ class TransactionForm(forms.ModelForm):
 
                 # no update, exclui a própria transação da soma
                 if self.instance.pk:
-                    spent -= Transaction.objects.filter(pk=self.instance.pk).values_list('amount', flat=True)[0]
+                    spent -= Transaction.objects.filter(
+                        pk=self.instance.pk
+                    ).values_list('amount', flat=True)[0]
 
                 if spent + amount > goal.limit_amount:
-                    raise forms.ValidationError(
-                        f'Meta estourada! Limite: R$ {goal.limit_amount} | '
-                        f'Gasto atual: R$ {spent} | '
-                        f'Esta transação: R$ {amount}'
+                    # Aviso mas não bloqueia — transação é salva mesmo assim
+                    self.add_warning(
+                        f'Atenção: meta de {category.name} será ultrapassada. '
+                        f'Limite: R$ {goal.limit_amount:.2f} | '
+                        f'Gasto: R$ {spent:.2f} | '
+                        f'Esta transação: R$ {amount:.2f}'
                     )
             except Goal.DoesNotExist:
                 pass
 
         return cleaned_data
 
+    def add_warning(self, message):
+        """Armazena avisos sem bloquear o salvamento."""
+        if not hasattr(self, 'warnings'):
+            self.warnings = []
+        self.warnings.append(message)
+
     def __init__(self, *args, **kwargs):
         user = kwargs.pop('user', None)
         super().__init__(*args, **kwargs)
         self.user = user
+        self.warnings = []
         if user:
             self.fields['category'].queryset = Category.objects.filter(user=user)

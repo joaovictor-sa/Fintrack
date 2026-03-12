@@ -5,9 +5,19 @@
 ![Docker](https://img.shields.io/badge/docker-%230db7ed.svg?style=for-the-badge&logo=docker&logoColor=white)
 ![License](https://img.shields.io/badge/license-MIT-important?style=for-the-badge)
 
+[![🚀 Live Demo](https://img.shields.io/badge/🚀_Live_Demo-fintrack--0l1x.onrender.com-blueviolet?style=for-the-badge)](https://fintrack-0l1x.onrender.com/)
+
 O **FinTrack** é uma aplicação completa para gestão de finanças pessoais. Ele permite o registro de receitas e despesas, organização por categorias, definição de metas e visualização de dados via Dashboard e API.
 
 A aplicação foi desenhada para ser executada em containers, garantindo que o ambiente de desenvolvimento seja idêntico ao de produção.
+
+---
+
+## 🔐 Acesso Demo
+
+Quer explorar sem criar conta? Temos a opçao de entrar como visitante com alguns templates ja prontos:
+
+> ⚠️ O servidor pode demorar ~30 segundos para acordar na primeira visita (plano gratuito do Render).
 
 ---
 
@@ -37,24 +47,26 @@ A aplicação foi desenhada para ser executada em containers, garantindo que o a
 Graças à automação do Docker, você só precisa de **um passo** para subir a aplicação completa (Banco de Dados + Web Server + Migrações + Dados Iniciais).
 
 ### Pré-requisitos
+
 * [Docker](https://www.docker.com/) instalado.
 * [Docker Compose](https://docs.docker.com/compose/install/) instalado
 
 ### Passo Único
 
-1.  **Clone o projeto e suba os containers:**
-    ```bash
-    git clone [https://github.com/joaovictor-sa/Fintrack.git](https://github.com/joaovictor-sa/Fintrack.git)
-    cd Fintrack
-    docker-compose up --build
-    ```
+1. **Clone o projeto e suba os containers:**
+```bash
+git clone https://github.com/joaovictor-sa/Fintrack.git
+cd Fintrack
+docker-compose up --build
+```
 
 **O que acontece agora?**
 O Docker irá:
-1.  Subir o banco PostgreSQL e aguardar ele estar saudável (`healthcheck`).
-2.  Executar as **migrações** (`migrate`) automaticamente.
-3.  Popular o banco com dados de teste (`seed_demo_data`).
-4.  Disponibilizar o sistema em [http://localhost:8000](http://localhost:8000).
+
+1. Subir o banco PostgreSQL e aguardar ele estar saudável (`healthcheck`).
+2. Executar as **migrações** (`migrate`) automaticamente.
+3. Popular o banco com dados de teste (`seed_demo_data`).
+4. Disponibilizar o sistema em [http://localhost:8000](http://localhost:8000).
 
 ---
 
@@ -73,4 +85,5 @@ O Docker irá:
 Este projeto está sob a licença MIT. Consulte o arquivo [LICENSE](LICENSE) para mais informações.
 
 ---
+
 💡 *Desenvolvido por [João Victor](https://github.com/joaovictor-sa)*

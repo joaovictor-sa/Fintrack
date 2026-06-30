@@ -12,7 +12,7 @@ class Goal(models.Model):
     description = models.TextField(blank=True, null=True)
 
     class Meta:
-        unique_together = ('category', 'month', 'year')  # Uma meta por categoria por mes
+        unique_together = ('user', 'category', 'month', 'year')  # Uma meta por categoria por mes
         ordering = ['-year', '-month']
 
     def __str__(self):

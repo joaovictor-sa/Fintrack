@@ -1,5 +1,5 @@
 from django.urls import path
-from .views import TransactionListView, TransactionCreateView, TransactionDetailView, TransactionUpdateView, TransactionDeleteView, TransactionListCreateAPIView, TransactionRetrieveUpdateDestroyAPIView
+from .views import TransactionListView, TransactionCreateView, TransactionDetailView, TransactionUpdateView, TransactionDeleteView, TransactionListCreateAPIView, TransactionRetrieveUpdateDestroyAPIView, MonthlySummaryView, WeeklySummaryView
 
 
 urlpatterns = [
@@ -11,5 +11,6 @@ urlpatterns = [
 
     path('api/v1/transactions/', TransactionListCreateAPIView.as_view(), name='transaction-list-create-api-view'),
     path('api/v1/transactions/<int:pk>/', TransactionRetrieveUpdateDestroyAPIView.as_view(), name='transaction-detail-api-view'),
-
+    path('api/v1/transactions/monthly-summary/', MonthlySummaryView.as_view(), name='monthly-summary'),
+    path('api/v1/transactions/weekly-summary/', WeeklySummaryView.as_view(), name='weekly-summary'),
 ]

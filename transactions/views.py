@@ -1,5 +1,8 @@
 from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from django.db.models import Sum
 from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView, DeleteView
@@ -107,3 +110,59 @@ class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIV
 
     def get_queryset(self):
         return models.Transaction.objects.filter(user=self.request.user)
+    
+
+class MonthlySummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        month = request.query_params.get('month')
+        year = request.query_params.get('year')
+
+        if not month or not year:
+            return Response({'error': 'month and year are required'}, status=400)
+        
+        qs = models.Transaction.objects.filter(
+            user=request.user,
+            date__month=month,
+            date__year=year
+        )
+
+        income = qs.filter(type='income').aggregate(t=Sum('amount'))['t'] or 0
+        expense = qs.filter(type='expense').aggregate(t=Sum('amount'))['t'] or 0
+
+        return Response({
+            'month': month,
+            'year': year,
+            'income': income,
+            'expense': expense,
+            'balance': income - expense
+        })
+
+
+class WeeklySummaryView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        week = request.query_params.get('week')
+        year = request.query_params.get('year')
+
+        if not week or not year:
+            return Response({'error': 'week and year are required'}, status=400)
+        
+        qs = models.Transaction.objects.filter(
+            user=request.user,
+            date__week=week,
+            date__year=year
+        )
+
+        income = qs.filter(type='income').aggregate(t=Sum('amount'))['t'] or 0
+        expense = qs.filter(type='expense').aggregate(t=Sum('amount'))['t'] or 0
+
+        return Response({
+            'week': week,
+            'year': year,
+            'income': income,
+            'expense': expense,
+            'balance': income - expense
+        })

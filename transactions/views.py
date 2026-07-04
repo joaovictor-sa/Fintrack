@@ -101,7 +101,7 @@ class TransactionListCreateAPIView(generics.ListCreateAPIView):
         return models.Transaction.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)
+        serializer.save(user=self.request.user)  # era self.request (typo)
 
 
 class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):
@@ -110,7 +110,7 @@ class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIV
 
     def get_queryset(self):
         return models.Transaction.objects.filter(user=self.request.user)
-    
+
 
 class MonthlySummaryView(APIView):
     permission_classes = [IsAuthenticated]
@@ -121,7 +121,7 @@ class MonthlySummaryView(APIView):
 
         if not month or not year:
             return Response({'error': 'month and year are required'}, status=400)
-        
+
         qs = models.Transaction.objects.filter(
             user=request.user,
             date__month=month,
@@ -149,7 +149,7 @@ class WeeklySummaryView(APIView):
 
         if not week or not year:
             return Response({'error': 'week and year are required'}, status=400)
-        
+
         qs = models.Transaction.objects.filter(
             user=request.user,
             date__week=week,

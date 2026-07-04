@@ -57,7 +57,7 @@ class GoalUpdateView(LoginRequiredMixin, UpdateView):
         kwargs = super().get_form_kwargs()
         kwargs['user'] = self.request.user
         return kwargs
-    
+
     def get_queryset(self):
         return models.Goal.objects.filter(user=self.request.user)
 
@@ -77,7 +77,7 @@ class GoalListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return models.Goal.objects.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 

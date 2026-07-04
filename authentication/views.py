@@ -1,5 +1,4 @@
 from django.contrib.auth import login, authenticate
-from django.contrib.auth.models import User
 from django.shortcuts import redirect
 from django.urls import reverse_lazy
 from django.views.generic import CreateView

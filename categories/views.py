@@ -40,7 +40,7 @@ class CategoryDetailView(LoginRequiredMixin, DetailView):
 
     def get_queryset(self):
         return models.Category.objects.filter(user=self.request.user)
-    
+
 
 class CategoryUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Category
@@ -59,7 +59,7 @@ class CategoryDeleteView(LoginRequiredMixin, DeleteView):
 
     def get_queryset(self):
         return models.Category.objects.filter(user=self.request.user)
-    
+
 
 class CategoryListCreateAPIView(generics.ListCreateAPIView):
     serializer_class = serializers.CategorySerializer
@@ -67,7 +67,7 @@ class CategoryListCreateAPIView(generics.ListCreateAPIView):
 
     def get_queryset(self):
         return models.Category.objects.filter(user=self.request.user)
-    
+
     def perform_create(self, serializer):
         serializer.save(user=self.request.user)
 

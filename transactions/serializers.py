@@ -10,7 +10,6 @@ class TransactionSerializer(serializers.ModelSerializer):
         fields = '__all__'
         read_only_fields = ('user',)
 
-
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
 

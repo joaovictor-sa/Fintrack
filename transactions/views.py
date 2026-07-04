@@ -101,7 +101,7 @@ class TransactionListCreateAPIView(generics.ListCreateAPIView):
         return models.Transaction.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        serializer.save(user=self.request.user)  # era self.requst (typo)
+        serializer.save(user=self.request.user)
 
 
 class TransactionRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

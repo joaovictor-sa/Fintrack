@@ -79,7 +79,7 @@ class GoalListCreateAPIView(generics.ListCreateAPIView):
         return models.Goal.objects.filter(user=self.request.user)
     
     def perform_create(self, serializer):
-        serializer.save(user=self.requst.user)
+        serializer.save(user=self.request.user)
 
 
 class GoalRetrieveUpdateDestroyAPIView(generics.RetrieveUpdateDestroyAPIView):

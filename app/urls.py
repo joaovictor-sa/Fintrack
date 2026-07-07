@@ -21,4 +21,5 @@ urlpatterns = [
     path('', include('transactions.urls')),
 
     path('api/v1/', include('authentication.urls')),
+    path('api/v1/', include('dashboard.api_urls')),
 ]

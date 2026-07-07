@@ -1,8 +1,12 @@
 from django.views.generic import TemplateView
 from django.db.models import Sum
 from django.contrib.auth.mixins import LoginRequiredMixin
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
 from transactions.models import Transaction
 from goals.models import Goal
+from .models import Dashboard
 import datetime
 
 
@@ -60,3 +64,11 @@ class DashboardView(LoginRequiredMixin, TemplateView):
             'mes_atual': today.strftime('%B/%Y'),
         })
         return context
+
+class DashboardAPIView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        dashboard = Dashboard(request.user)
+        data = dashboard.get_data()
+        return Response(data)
